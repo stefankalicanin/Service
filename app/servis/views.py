@@ -1,0 +1,265 @@
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from rest_framework import status
+from django.utils.dateparse import parse_datetime
+from django.contrib.auth import get_user_model
+import json
+
+from core.models import UserProfile, Location, RepairerProfile, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing
+from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService
+
+@api_view(['GET'])
+def HelloWorld(request):
+    return Response("Hello World", status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_all_users_profile(request):
+    return Response(UserProfileService.get_all_users_profiles(), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def register_user(request):
+    data = json.loads(request.body)
+
+    location = Location (
+        country = data['country'],
+        city = data['city'],
+        address = data['address']
+    )
+
+    
+    
+    user = get_user_model().objects.create(
+        username = data['username'], 
+        password = data['password'], 
+        first_name = data['first_name'],
+        last_name = data['last_name'],
+        role = CustomUser.Role.USER
+    )
+
+    user_profile = UserProfile (
+        user = user,
+        birthday = data['birthday'],
+        gender = data['gender'],
+        location = location,
+        privileges = False
+    )
+    
+    location.save()
+    user.save()
+    user_profile.save()
+    
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def register_repairer(request):
+    data = json.loads(request.body)
+
+    user = get_user_model().objects.create(
+        username = data['username'], 
+        password = data['password'], 
+        first_name = data['first_name'],
+        last_name = data['last_name'],
+        role = CustomUser.Role.REPAIR_DIAGNOSTIC)
+
+    repairer_profile = RepairerProfile (
+        user = user,
+        birthday = data['birthday'],
+        gender = data['gender'],
+        salary = 100000,
+        rating = 0,
+        type = data['type']
+    )
+
+    user.save()
+    repairer_profile.save()
+    
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def get_diagnostic_schedule_appointment(request):
+    data = json.loads(request.body)
+
+    date = parse_datetime(data['date'])
+    response, start_time, end_time = ScheduleAppointmentService.get_diagnostic_schedule_appointment(date)
+    res = {
+            "start_time" : str(start_time),
+            "end_time" : str(end_time)
+        }
+    
+    return Response(res, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def create_diagnostic_request(request):
+    data = json.loads(request.body)
+
+    date = parse_datetime(data['date'])
+    response, start_time, end_time = ScheduleAppointmentService.get_diagnostic_schedule_appointment(date)
+
+    schedule_appointment = ScheduleAppointment(
+        start_time = start_time,
+        end_time = end_time,
+        is_done = False,
+        repairer_profile = RepairerProfile.objects.get(id=response['id'])
+        )
+    schedule_appointment.save()
+
+    diagnostics_request = DiagnosticsRequest(
+        type_house = data['type_house'],
+        date = start_time,
+        ready_for_repair = False,
+        user = get_user_model().objects.get(id=data['id_user']),
+        device = Device.objects.get(id=data['id_device']),
+        schedule_appointment = schedule_appointment
+        )
+    diagnostics_request.save()
+
+    return Response(response, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def get_all_categories(request):
+    return Response(CategoryService.get_all_categories(), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_all_device_by_category(request, id):
+    category = Category.objects.get(id=id)
+
+    return Response(DeviceService.get_all_device_by_category(category), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_one_category(request, id):
+    return Response(CategoryService.get_one_category(id), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_diagnostic_schedule_appointments_by_repairer(request, id):
+    return Response(ScheduleAppointmentService.get_diagnostic_schedule_appointments_by_repairer(id), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_repairer_profile_by_user(request, id):
+    return Response(RepairerService.get_repairer_profile_by_user(id), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def update_diagnostic_schedule_appointment_done(request, id):
+    return Response(ScheduleAppointmentService.update_diagnostic_schedule_appointment_done(id), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_done_diagnostic_requests_by_user(request, id):
+    return Response(DiagnosticReportService.get_done_diagnostic_requests_by_user(id), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_troubleshooting_request_repair(request):
+    data = json.loads(request.body)
+    date = parse_datetime(data['date'])
+
+    response, start_time, end_time = TroubleshootingService.create_troubleshooting_request_repair(date)
+
+    res = {
+            "start_time" : str(start_time),
+            "end_time" : str(end_time)
+        }
+    
+    return Response(res, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def save_troubleshooting_request_repair(request):
+    data = json.loads(request.body)
+    date = parse_datetime(data['date'])
+    type = data['type']
+    response, start_time, end_time = TroubleshootingService.create_troubleshooting_request_repair(date)
+    
+    DiagnosticsRequest.objects.filter(id=data['id']).update(ready_for_repair=True)
+    diagnostic_request = DiagnosticsRequest.objects.get(id=data['id'])
+    diagnostic_report = DiagnosticReport.objects.get(diagnostic_request=diagnostic_request)
+    
+    device_quantity = diagnostic_report.device.quantity
+    Device.objects.filter(id=diagnostic_report.device.id).update(quantity=device_quantity-1)
+    schedule_appointment = ScheduleAppointment(
+        start_time = start_time,
+        end_time = end_time,
+        is_done = False,
+        repairer_profile = RepairerProfile.objects.get(id=response['id'])
+        )
+    schedule_appointment.save()
+
+    if type:
+        type_troubleshooting = Troubleshooting.TypeOfTroubleshooting.REPLACE
+    else:
+        type_troubleshooting = Troubleshooting.TypeOfTroubleshooting.REPAIR
+        
+    troubleshooting = Troubleshooting(
+        type = type_troubleshooting,
+        date = start_time,
+        schedule_appointment = schedule_appointment,
+        diagnostic_request = diagnostic_request
+    )
+
+    troubleshooting.save()
+
+    return Response(response)
+
+@api_view(['GET'])
+def get_troubleshooting_request_by_repair(request, id):
+    id = id
+    return Response(TroubleshootingService.get_troubleshooting_request_by_repair(id), status.HTTP_200_OK)
+
+@api_view(['POST'])
+def troubleshooting_request_done(request, id):
+    id = id
+    return Response(TroubleshootingService.troubleshooting_request_done(id), status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_wait_diagnostic_requests_by_user(request, id):
+    id = id
+    return Response(DiagnosticsRequestService.get_wait_diagnostic_requests_by_user(id), status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_wait_troubleshooting_requests_by_user(request, id):
+    id = id
+    return Response(TroubleshootingService.get_wait_troubleshooting_requests_by_user(id), status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_done_troubleshooting_requests_by_user(request, id):
+    id = id
+    return Response(TroubleshootingService.get_done_troubleshooting_requests_by_user(id), status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_devices_by_device(request, id):
+    id = id
+    return Response(DeviceService.get_devices_by_device(id), status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_diagnostic_report(request):
+    data = json.loads(request.body)
+
+    price = Pricing (
+        price = 200,
+        discount_quota = 1
+    )
+
+    price.save()
+    
+    diagnostic_report = DiagnosticReport(
+        description = data['description'],
+        device = Device.objects.get(id=data['id_device']),
+        diagnostic_request = DiagnosticsRequest.objects.get(id=data['id_diagnostic']),
+        price = price
+    )
+
+    diagnostic_report.save()
+
+    return Response(status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def get_number_of_devices(request, id):
+    return Response(DeviceService.get_number_of_devices(id), status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_order_by_device(request, id):
+    number_device = DeviceService.get_number_of_devices(id)
+    if number_device == 0:
+            order = OrderService.get_order_by_device(id)
+            return Response(order, status.HTTP_200_OK)
+    else:
+        return Response(None, status.HTTP_200_OK)
+        
+    
