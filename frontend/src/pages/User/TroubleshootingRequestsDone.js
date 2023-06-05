@@ -1,10 +1,14 @@
 import {React, useEffect, useState} from 'react'
 import {TokenService} from '../../services/TokenService'
 import axios from 'axios'
+import Button from 'react-bootstrap/Button';
+
 function TroubleshootingRequestsDone() {
   const decoded_token = TokenService.decodeToken(TokenService.getToken())
   const [troubleshooting, setTroubleshooting] = useState([])
   const [checkTable, setCheckTable] = useState(false)
+  const [pdf, setPdf] = useState()
+
   useEffect(() => {
     axios.get(`http://localhost:8000/api/user/troubleshooting_request_done/${decoded_token.user_id}`)
     .then(res => {
@@ -19,6 +23,22 @@ function TroubleshootingRequestsDone() {
       console.log(error)
     })
   }, [])
+
+  const createReport = (troubleshooting_id) => {
+    axios
+      .get(`http://localhost:8000/api/user/report/${troubleshooting_id}`, {
+        responseType: 'arraybuffer',
+      })
+      .then((res) => {
+        const pdfData = new Blob([res.data], { type: 'application/pdf' });
+        const pdfUrl = URL.createObjectURL(pdfData);
+        window.open(pdfUrl, '_blank');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div>
        <div style={{width:'70%', margin:'auto', marginTop:'100px' }}>
@@ -31,6 +51,7 @@ function TroubleshootingRequestsDone() {
       <th scope="col">Start time</th>
       <th scope="col">End time</th>
       <th scope="col">Device</th>
+      <th scope="col">Report</th>
     </tr>
   </thead>
   <tbody>
@@ -41,6 +62,7 @@ function TroubleshootingRequestsDone() {
         <th>{tr.schedule_appointment.start_time.replace('T', ' ').replace('Z', '')}</th>
         <th>{tr.schedule_appointment.end_time.replace('T', ' ').replace('Z', '')}</th>
         <th>{tr.diagnostic_request.device.name}</th>
+        <th><Button onClick={()=> createReport(tr.id)}>Report</Button></th>
       </tr>
     ))}
     

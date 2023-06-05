@@ -25,5 +25,6 @@ urlpatterns = [
     path('user/device/devices/<int:id>', views.get_devices_by_device, name="Get all devices from device"),
     path('user/diagnostic_report', views.create_diagnostic_report, name="Create diagnostic report"),
     path('user/devices/quantity/<int:id>', views.get_number_of_devices, name="Get quantity of device"),
-    path('user/order/device/<int:id>', views.get_order_by_device, name="Get order for device device")
+    path('user/order/device/<int:id>', views.get_order_by_device, name="Get order for device device"),
+    path('user/report/<int:id>', views.generate_PDF, name="Generate report")
 ]
