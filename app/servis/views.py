@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from django.utils.dateparse import parse_datetime
 from django.contrib.auth import get_user_model
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+
 import json
 
 from core.models import UserProfile, Location, RepairerProfile, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing
@@ -261,5 +264,36 @@ def get_order_by_device(request, id):
             return Response(order, status.HTTP_200_OK)
     else:
         return Response(None, status.HTTP_200_OK)
-        
+    
+@api_view(['GET'])
+def generate_PDF(request, id):
+    troubleshooting_request = Troubleshooting.objects.get(id=id)
+    diagnostic_request = DiagnosticsRequest.objects.get(id=troubleshooting_request.diagnostic_request.id)
+    diagnostic_report = DiagnosticReport.objects.get(diagnostic_request=diagnostic_request)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+
+    pdf = canvas.Canvas(response)
+    
+    pdf.drawString(250, 800, "Report")
+    pdf.drawString(250, 750, "Diagnostic request details")
+    pdf.drawString(50, 700, "Device: " + str(diagnostic_request.device.name))
+    pdf.drawString(50, 680, "Category of device: "+ str(diagnostic_request.device.category.name))
+    pdf.drawString(50, 660, "Start time: " + str(diagnostic_request.schedule_appointment.start_time))
+    pdf.drawString(50, 640, "End time: " + str(diagnostic_request.schedule_appointment.end_time))
+    pdf.drawString(50, 620, "Repairer " + str(diagnostic_request.schedule_appointment.repairer_profile.user.username) + " recommended " + str(troubleshooting_request.type) + " device " + str(diagnostic_report.device.name))
+    pdf.drawString(50, 600, "Description: " + str(diagnostic_report.description))
+    pdf.drawString(50, 580, "Price: " + str(diagnostic_report.price) + " €")
+    pdf.drawString(250, 530, "Troubleshooting details")
+    pdf.drawString(50, 510, "Start time: " + str(troubleshooting_request.schedule_appointment.start_time))
+    pdf.drawString(50, 490, "End time: " + str(troubleshooting_request.schedule_appointment.end_time))
+    pdf.drawString(50, 470, "The problem is solved by: " + str(troubleshooting_request.schedule_appointment.repairer_profile.user.username))
+    pdf.showPage()
+    pdf.save()
+
+    return response
+    
+
+
     
