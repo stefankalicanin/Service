@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 
 from core.models import UserProfile, DiagnosticsRequest, ScheduleAppointment, RepairerProfile, Category, Device, CustomUser, Troubleshooting, DiagnosticReport, Order, Pricing
 
@@ -10,7 +9,7 @@ class CustomUserSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username']
+        fields = ['id', 'username', 'first_name', 'last_name']
 
 
 class UserProfileSerializers(serializers.ModelSerializer):
