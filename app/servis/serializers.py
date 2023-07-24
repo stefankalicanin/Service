@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import UserProfile, DiagnosticsRequest, ScheduleAppointment, RepairerProfile, Category, Device, CustomUser, Troubleshooting, DiagnosticReport, Order, Pricing
+from core.models import Client, DiagnosticsRequest, ScheduleAppointment, Repairer, Category, Device, CustomUser, Troubleshooting, DiagnosticReport, Order, Pricing
 
 
 
@@ -17,7 +17,7 @@ class UserProfileSerializers(serializers.ModelSerializer):
     user = CustomUserSerializers()
 
     class Meta:
-        model = UserProfile
+        model = Client
         fields = ['id', 'user']
 
 
@@ -43,7 +43,7 @@ class RepairerProfileSerializers(serializers.ModelSerializer):
     user = CustomUserSerializers()
 
     class Meta:
-        model = RepairerProfile
+        model = Repairer
         fields = ['id', 'user']
 
 

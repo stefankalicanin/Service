@@ -12,23 +12,29 @@ class CustomUser(AbstractUser):
         REPAIR_DIAGNOSTIC = "REPAIR_DIAGNOSTIC"
         REPAIR_TROUBLESHOOTING = "REPAIR_TROUBLESHOOTING"
 
-    role = models.CharField(max_length=25, choices=Role.choices)
+    class Gender(models.TextChoices):
+        M = "Male"
+        F = "Female"
 
+    role = models.CharField(max_length=25, choices=Role.choices)
+    gender = models.CharField(max_length=6, choices=Gender.choices)
+    birthday = models.DateField(null=True, blank=True)
 
 class Location(models.Model):
-    country = models.CharField(max_length=20)
-    city = models.CharField(max_length=20)
-    address = models.CharField(max_length=20)
+    country = models.CharField(max_length=128)
+    city = models.CharField(max_length=128)
+    address = models.CharField(max_length=128)
+    zip = models.IntegerField()
+    region = models.CharField(max_length=128)
+    number = models.CharField(max_length=16)
 
     def __str__(self) -> str :
         return self.country
 
 
-class UserProfile(models.Model):
-    birthday = models.DateField()
-    gender = models.CharField(max_length=6)
+class Client(models.Model):
     privileges = models.BooleanField()
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
@@ -42,12 +48,10 @@ class UserProfile(models.Model):
         return self.user.username
 
 
-class RepairerProfile(models.Model):
-    birthday = models.DateField()
-    gender = models.CharField(max_length=10)
+class Repairer(models.Model):
     salary = models.FloatField()
     rating = models.IntegerField()
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
@@ -57,16 +61,21 @@ class RepairerProfile(models.Model):
 
 
 class Category(models.Model):
-    name = models.TextField()
-    big_size = models.BooleanField()
+
+    class Size(models.TextChoices):
+        BIG = "BIG"
+        SMALL = "SMALL"
+        
+    name = models.CharField(max_length=128)
+    size = models.CharField(max_length=5, choices=Size.choices)
 
     def __str__(self) -> str :
         return self.name
 
 
 class Device(models.Model):
-    name = models.TextField()
-    description = models.TextField()
+    name = models.CharField(max_length=128)
+    description = models.CharField(max_length=1024)
     price = models.FloatField()
     under_warranty = models.BooleanField()
     quantity = models.IntegerField()
@@ -91,7 +100,7 @@ class ScheduleAppointment(models.Model):
     end_time = models.DateTimeField()
     is_done = models.BooleanField()
     repairer_profile = models.ForeignKey(
-        RepairerProfile,
+        Repairer,
         on_delete = models.CASCADE
     )
 
@@ -100,18 +109,22 @@ class ScheduleAppointment(models.Model):
     
 
 class DiagnosticsRequest(models.Model):
-    type_house = models.BooleanField()
+
+    class DiagnosticType(models.TextChoices):
+        HOUSE = "HOUSE"
+        IN_SERVICE = "IN SERVICE"
+
+    type_house = models.CharField(max_length=10, choices=DiagnosticType.choices)
     date = models.DateTimeField()
-    ready_for_repair = models.BooleanField(default=False)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+    client = models.ForeignKey(
+        Client,
         on_delete=models.CASCADE
     )
     device = models.ForeignKey(
         Device,
         on_delete=models.DO_NOTHING
     )
-    schedule_appointment = models.ForeignKey(
+    schedule_appointment = models.OneToOneField(
         ScheduleAppointment,
         on_delete=models.CASCADE
     )
@@ -119,7 +132,22 @@ class DiagnosticsRequest(models.Model):
     def __str__(self) -> str :
         return str(self.date)
     
+class DiagnosticReport(models.Model):
 
+    class State(models.TextChoices):
+        SUCCESSFULLY = "SUCCESSFULLY"
+        UNSUCCESSFULLY = "UNSUCCESSFULLY"
+
+    description = models.CharField(max_length=1024)
+    state = models.CharField(max_length=14, choices=State.choices)
+    diagnostic_request = models.OneToOneField(
+        DiagnosticsRequest,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self) -> str :
+        return self.description
+    
 class Troubleshooting(models.Model):
 
 
@@ -130,15 +158,18 @@ class Troubleshooting(models.Model):
 
     type = models.CharField(max_length=7, choices=TypeOfTroubleshooting.choices)  
     date = models.DateTimeField() 
-    schedule_appointment = models.ForeignKey(
+    schedule_appointment = models.OneToOneField(
         ScheduleAppointment,
         on_delete=models.CASCADE
     )
-    diagnostic_request = models.ForeignKey(
+    diagnostic_request = models.OneToOneField(
         DiagnosticsRequest,
         on_delete=models.CASCADE
     )
-
+    diagnostic_report = models.OneToOneField(
+        DiagnosticReport,
+        on_delete=models.CASCADE
+    )
     def __str__(self) -> str :
         return self.type
 
@@ -146,30 +177,13 @@ class Troubleshooting(models.Model):
 class Pricing(models.Model):
     price = models.FloatField()
     discount_quota = models.FloatField()
-
+    schedule_appointment = models.OneToOneField(
+        ScheduleAppointment,
+        on_delete = models.CASCADE
+    )
     def __str__(self) -> str :
         return str(self.price)
 
-
-class DiagnosticReport(models.Model):
-    description = models.TextField()
-    device = models.ForeignKey(
-        Device,
-        on_delete=models.CASCADE
-    )
-    diagnostic_request = models.OneToOneField(
-        DiagnosticsRequest,
-        on_delete=models.CASCADE
-    )
-    price = models.OneToOneField(
-        Pricing,
-        on_delete=models.SET_NULL,
-        null=True
-    )
-
-    def __str__(self) -> str :
-        return self.description
-    
 
 class Order(models.Model):
     date = models.DateTimeField()
@@ -180,7 +194,21 @@ class Order(models.Model):
     )
 
 
+class TravelWarrant(models.Model):
+    data = models.CharField(max_length=1024)
+    schedule_appointment = models.OneToOneField(
+        ScheduleAppointment,
+        on_delete = models.CASCADE
+    )
 
+
+class TroubleshootingReport(models.Model):
+    description = models.CharField(max_length=1024)
+    state = models.CharField(max_length=14, choices=DiagnosticReport.State.choices)
+    troubleshooting = models.OneToOneField(
+        Troubleshooting,
+        on_delete = models.CASCADE
+    )
 
     
 

@@ -10,7 +10,7 @@ from django.http import HttpResponse
 import json
 import os
 
-from core.models import UserProfile, Location, RepairerProfile, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing
+from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing
 from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService
 
 @api_view(['GET'])
@@ -28,7 +28,10 @@ def register_user(request):
     location = Location (
         country = data['country'],
         city = data['city'],
-        address = data['address']
+        address = data['address'],
+        zip = data['zip'],
+        region = data['region'],
+        number = data['number']
     )
 
     
@@ -38,20 +41,20 @@ def register_user(request):
         password = data['password'], 
         first_name = data['first_name'],
         last_name = data['last_name'],
-        role = CustomUser.Role.USER
+        role = CustomUser.Role.USER,
+        birthday = data['birthday'],
+        gender = data['gender']
     )
 
-    user_profile = UserProfile (
+    client = Client (
         user = user,
-        birthday = data['birthday'],
-        gender = data['gender'],
         location = location,
         privileges = False
     )
     
     location.save()
     user.save()
-    user_profile.save()
+    client.save()
     
     return Response(status=status.HTTP_201_CREATED)
 
@@ -64,19 +67,19 @@ def register_repairer(request):
         password = data['password'], 
         first_name = data['first_name'],
         last_name = data['last_name'],
-        role = CustomUser.Role.REPAIR_DIAGNOSTIC)
-
-    repairer_profile = RepairerProfile (
-        user = user,
+        role = data['role'],
         birthday = data['birthday'],
-        gender = data['gender'],
+        gender = data['gender']
+    )
+
+    repairer = Repairer (
+        user = user,
         salary = 100000,
-        rating = 0,
-        type = data['type']
+        rating = 0
     )
 
     user.save()
-    repairer_profile.save()
+    repairer.save()
     
     return Response(status=status.HTTP_201_CREATED)
 
@@ -104,7 +107,7 @@ def create_diagnostic_request(request):
         start_time = start_time,
         end_time = end_time,
         is_done = False,
-        repairer_profile = RepairerProfile.objects.get(id=response['id'])
+        repairer_profile = Repairer.objects.get(id=response['id'])
         )
     schedule_appointment.save()
 
@@ -181,7 +184,7 @@ def save_troubleshooting_request_repair(request):
         start_time = start_time,
         end_time = end_time,
         is_done = False,
-        repairer_profile = RepairerProfile.objects.get(id=response['id'])
+        repairer_profile = Repairer.objects.get(id=response['id'])
         )
     schedule_appointment.save()
 

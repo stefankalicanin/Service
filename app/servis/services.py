@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 
 import datetime
 
-from core.models import UserProfile, DiagnosticsRequest, ScheduleAppointment, RepairerProfile, Category, Device, Pricing, Troubleshooting, CustomUser, DiagnosticReport, Order
+from core.models import Client, DiagnosticsRequest, ScheduleAppointment, Repairer, Category, Device, Pricing, Troubleshooting, CustomUser, DiagnosticReport, Order
 from servis.serializers import UserProfileSerializers, DiagnosticsRequestSerializers, TroubleshootingSerializers, RepairerProfileSerializers, CategorySerializers, DeviceSerializers, DiagnosticReportSerializers, OrderSerializers
     
 
@@ -12,7 +12,7 @@ class UserProfileService:
 
     @staticmethod
     def get_all_users_profiles():
-        users_profiles = UserProfile.objects.all()
+        users_profiles = Client.objects.all()
 
         serializersUserProfile = UserProfileSerializers(users_profiles, many=True)
         return serializersUserProfile.data
@@ -23,14 +23,14 @@ class RepairerService:
     @staticmethod
     def get_one_repairer_for_diagnostic():
         user = get_user_model().objects.get(role = CustomUser.Role.REPAIR_DIAGNOSTIC)
-        repairer_profile = RepairerProfile.objects.filter(user=user).first()
+        repairer_profile = Repairer.objects.filter(user=user).first()
 
         serializersRepairerProfile = RepairerProfileSerializers(repairer_profile)
         return serializersRepairerProfile.data
 
     @staticmethod
     def get_repairer_profile_by_user(id):
-        repairer_profile = RepairerProfile.objects.get(user_id = id)
+        repairer_profile = Repairer.objects.get(user_id = id)
         
         serializersRepairerProfile = RepairerProfileSerializers(repairer_profile)
         return serializersRepairerProfile.data
@@ -38,7 +38,7 @@ class RepairerService:
     @staticmethod
     def get_one_repairer_for_troubleshooting():
         user = get_user_model().objects.get(role = CustomUser.Role.REPAIR_TROUBLESHOOTING)
-        repairer_profile = RepairerProfile.objects.filter(user=user).first()
+        repairer_profile = Repairer.objects.filter(user=user).first()
 
         serializersRepairerProfile = RepairerProfileSerializers(repairer_profile)
         return serializersRepairerProfile.data
