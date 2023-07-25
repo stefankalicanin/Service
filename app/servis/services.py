@@ -5,7 +5,19 @@ from django.contrib.auth import get_user_model
 import datetime
 
 from core.models import Client, DiagnosticsRequest, ScheduleAppointment, Repairer, Category, Device, Pricing, Troubleshooting, CustomUser, DiagnosticReport, Order
-from servis.serializers import UserProfileSerializers, DiagnosticsRequestSerializers, TroubleshootingSerializers, RepairerProfileSerializers, CategorySerializers, DeviceSerializers, DiagnosticReportSerializers, OrderSerializers
+from servis.serializers import UserProfileSerializers, DiagnosticsRequestSerializers, TroubleshootingSerializers, RepairerProfileSerializers, CategorySerializers, DeviceSerializers, DiagnosticReportSerializers, OrderSerializers, CustomUserSerializers
+    
+
+class UserService: 
+
+    @staticmethod
+    def change_repairer_password(username, password):
+        user = get_user_model().objects.get(username = username)
+        user.set_password(password)
+        user.save()
+
+        serializersCustomUser = CustomUserSerializers(user)
+        return serializersCustomUser.data
     
 
 class UserProfileService:
@@ -16,6 +28,7 @@ class UserProfileService:
 
         serializersUserProfile = UserProfileSerializers(users_profiles, many=True)
         return serializersUserProfile.data
+
 
 
 class RepairerService:

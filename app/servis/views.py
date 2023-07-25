@@ -11,7 +11,7 @@ import json
 import os
 
 from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing
-from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService
+from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService, UserService
 
 @api_view(['GET'])
 def HelloWorld(request):
@@ -37,14 +37,15 @@ def register_user(request):
     
     
     user = get_user_model().objects.create(
-        username = data['username'], 
-        password = data['password'], 
+        username = data['username'],
         first_name = data['first_name'],
         last_name = data['last_name'],
         role = CustomUser.Role.USER,
         birthday = data['birthday'],
         gender = data['gender']
     )
+
+    user.set_password(data['password'])
 
     client = Client (
         user = user,
@@ -63,14 +64,15 @@ def register_repairer(request):
     data = json.loads(request.body)
 
     user = get_user_model().objects.create(
-        username = data['username'], 
-        password = data['password'], 
+        username = data['username'],
         first_name = data['first_name'],
         last_name = data['last_name'],
-        role = data['role'],
+        role = data['type'],
         birthday = data['birthday'],
         gender = data['gender']
     )
+
+    user.set_password(data['password'])
 
     repairer = Repairer (
         user = user,
@@ -95,6 +97,16 @@ def get_diagnostic_schedule_appointment(request):
         }
     
     return Response(res, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def change_password_repairer(request):
+    data = json.loads(request.body)
+
+    username = data['username']
+    password = data['password']
+    repairer = UserService.change_repairer_password(username, password)
+    
+    return Response(repairer, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def create_diagnostic_request(request):
