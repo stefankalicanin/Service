@@ -12,13 +12,19 @@ class UserService:
 
     @staticmethod
     def change_repairer_password(username, password):
-        user = get_user_model().objects.get(username = username)
+        user = get_user_model().objects.get(username=username)
         user.set_password(password)
         user.save()
 
         serializersCustomUser = CustomUserSerializers(user)
         return serializersCustomUser.data
     
+    @staticmethod
+    def get_one_user(id):
+        user = get_user_model().objects.get(id=id)
+
+        serializersCustomUser = CustomUserSerializers(user)
+        return serializersCustomUser.data
 
 class UserProfileService:
 

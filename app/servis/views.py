@@ -21,6 +21,10 @@ def HelloWorld(request):
 def get_all_users_profile(request):
     return Response(UserProfileService.get_all_users_profiles(), status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def get_one_user(request,id):
+    return Response(UserService.get_one_user(id), status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 def register_user(request):
     data = json.loads(request.body)
