@@ -18,9 +18,10 @@ function Login() {
         setCredentials({...credentials, [name] : val})
     };
 
+
     const login = async () => {
         await AuthenticationService.login(credentials)
-        .then((value)=>{if (value === 401) {setError(true)}})
+        .then((value)=>{if (value === 401 ) {setError(true)}})
        ;}
 
 

@@ -14,6 +14,7 @@ import DiagnosticRequestsDone from './pages/User/DiagnosticRequestsDone';
 import DiagnosticRequestsWait from './pages/User/DiagnosticRequestsWait';
 import TroubleshootingRequestsDone from './pages/User/TroubleshootingRequestsDone';
 import TroubleshootingRequestsWait from './pages/User/TroubleshootingRequestsWait';
+import ChangePassword from './pages/Home/ChangePassword';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 
@@ -38,6 +39,7 @@ function App() {
           <Route path = '/user/diagnostic_requests/wait' element = {<DiagnosticRequestsWait/>}/>
           <Route path = '/user/troubleshooting_requests/done' element = {<TroubleshootingRequestsDone/>}/>
           <Route path = '/user/troubleshooting_requests/wait' element = {<TroubleshootingRequestsWait/>}/>
+          <Route path = '/repairer/password' element = {<ChangePassword/>}/>
         </Routes>
       </BrowserRouter>
     </div>

@@ -26,5 +26,6 @@ urlpatterns = [
     path('user/diagnostic_report', views.create_diagnostic_report, name="Create diagnostic report"),
     path('user/devices/quantity/<int:id>', views.get_number_of_devices, name="Get quantity of device"),
     path('user/order/device/<int:id>', views.get_order_by_device, name="Get order for device device"),
-    path('user/report/<int:id>', views.generate_PDF, name="Generate report")
+    path('user/report/<int:id>', views.generate_PDF, name="Generate report"),
+    path('repairer/password', views.change_password_repairer, name="Change password repairer - first time login")
 ]

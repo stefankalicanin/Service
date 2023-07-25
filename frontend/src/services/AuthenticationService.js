@@ -4,7 +4,7 @@ import { TokenService } from "./TokenService";
 export const AuthenticationService = {
   login,
   logout,
-  getRole,
+  getRole
 };
 
 async function login(userCredentials) {
@@ -16,7 +16,11 @@ async function login(userCredentials) {
     const decoded_token = TokenService.decodeToken(response.data.access);
     if (decoded_token) {
       TokenService.setToken(response.data.access);
-      const role = decoded_token.role;
+      const role = getRole();
+      if (userCredentials.password === '123' && (role === 'REPAIR_DIAGNOSTIC' || role === 'REPAIR_TROUBLESHOOTING')) {
+        window.location.assign("/repairer/password")
+      }
+      else {
       if(role === 'ADMIN') {
         window.location.assign("/admin/home");
       }
@@ -25,7 +29,6 @@ async function login(userCredentials) {
       }
       else if (role === 'REPAIR_TROUBLESHOOTING') {
         window.location.assign("/repairert/home");
-      
     } 
     else if (role === 'USER') {
       window.location.assign("/user/home")
@@ -33,11 +36,14 @@ async function login(userCredentials) {
     else {
       console.error("Invalid token");
     }
-
-  } }catch (error) {
+  }
+}
+  }
+catch (error) {
     return error.response.status;
   }
 }
+
 
 
 function logout() {

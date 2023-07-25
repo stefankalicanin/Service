@@ -11,7 +11,13 @@ function RegisterRepair() {
     password : '',
     birthday : '',
     gender : '',
-    type : ''
+    type : '',
+    country : '',
+    city : '',
+    address : '',
+    zip : '',
+    region : '',
+    number : ''
   });
 
   const handleFormInputChange = (name) => (event) => {
@@ -84,10 +90,50 @@ function RegisterRepair() {
                 <Form.Group className="mb-3" controlId="formBasicType">
                 <Form.Select aria-label="Default select example" name="type" value={user.type} onChange={handleFormInputChange("type")}>
                     <option>Select type</option>
-                    <option value={"DIAGNOSTIC"}>For diagnostics</option>
-                    <option value={"REPAIR"}>For repair</option>
+                    <option value={"REPAIR_DIAGNOSTIC"}>For diagnostics</option>
+                    <option value={"REPAIR_TROUBLESHOOTING"}>For repair</option>
                 </Form.Select>
                 </Form.Group>
+                <div class='row'>
+                    <div class='col'>
+                <Form.Group className="mb-3" controlId="formBasicCountry">
+                    <Form.Label>Country</Form.Label>
+                    <Form.Control type="text" placeholder="Enter country" name="country" value={user.country} onChange={handleFormInputChange("country")}/>
+                </Form.Group>
+                    </div>
+                    <div class='col'>
+                <Form.Group className="mb-3" controlId="formBasicLastCity">
+                    <Form.Label>City</Form.Label>
+                    <Form.Control type="text" placeholder="Enter city" name="last_name" value={user.city} onChange={handleFormInputChange("city")}/>
+                </Form.Group>
+                    </div> 
+                    <div class='col'>
+                <Form.Group className="mb-3" controlId="formBasicLastAddress">
+                    <Form.Label>Address</Form.Label>
+                    <Form.Control type="text" placeholder="Enter address" name="address" value={user.address} onChange={handleFormInputChange("address")}/>
+                </Form.Group>
+                    </div> 
+                </div>
+                <div class='row'>
+                    <div class='col'>
+                <Form.Group className="mb-3" controlId="formBasicZip">
+                    <Form.Label>Zip</Form.Label>
+                    <Form.Control type="text" placeholder="Enter zip code" name="zip" value={user.zip} onChange={handleFormInputChange("zip")}/>
+                </Form.Group>
+                    </div> 
+                    <div class='col'>
+                <Form.Group className="mb-3" controlId="formBasicRegion">
+                    <Form.Label>Region</Form.Label>
+                    <Form.Control type="text" placeholder="Enter region" name="region" value={user.region} onChange={handleFormInputChange("region")}/>
+                </Form.Group>
+                    </div> 
+                    <div class='col'>
+                <Form.Group className="mb-3" controlId="formBasicNumber">
+                    <Form.Label>Number</Form.Label>
+                    <Form.Control type="text" placeholder="Enter number" name="number" value={user.number} onChange={handleFormInputChange("number")}/>
+                </Form.Group>
+                    </div> 
+                </div>
                 <Button variant="primary" onClick={register}>
                     Submit
                 </Button>
