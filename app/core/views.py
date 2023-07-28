@@ -4,6 +4,9 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.db.models import Q
 from django.contrib.auth import get_user_model
+from django.http import Http404
+from django.http import JsonResponse
+from rest_framework import status
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 

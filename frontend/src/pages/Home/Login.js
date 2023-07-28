@@ -12,7 +12,8 @@ function Login() {
     })
 
     const [error, setError] = useState(false)
-
+    const [errorUsername, setErrorUsername] = useState(false)
+    const [errorPassword, setErrorPassword] = useState(false)
     const handleFormInputChange = (name) => (event) => {
         const val = event.target.value;
         setCredentials({...credentials, [name] : val})
@@ -20,8 +21,18 @@ function Login() {
 
 
     const login = async () => {
+        if(credentials.username.trim() === '') {
+            setErrorUsername(true)
+            return;
+        }
+        if(credentials.password.trim() === '') {
+            setErrorPassword(true)
+            return;
+        }
+        setErrorUsername(false)
+        setErrorPassword(false)
         await AuthenticationService.login(credentials)
-        .then((value)=>{if (value === 401 ) {setError(true)}})
+        .then(response=>{if (response.response.status === 500) {setError(true)}})
        ;}
 
 
@@ -33,35 +44,34 @@ function Login() {
         
     </div> 
         <div style={{width : '30%',
-                    height : '400px',
+                    height : '450px',
                     margin : 'auto',
-                marginTop : '150px',
+                marginTop : '100px',
                 backgroundColor:'#E4E9E1',
                 borderRadius:'25px',
                 border : '1px solid black'}}>
-                    <h1 style={{paddingLeft:'175px',paddingTop:'40px',backgroundColor:'#ffffff8c',borderRadius:'25px'
-                    }}>Login</h1>
+                    <h1 style={{paddingLeft:'75px',paddingTop:'40px',backgroundColor:'#ffffff8c',borderRadius:'25px'
+                    }}>Prijava na sistem</h1>
             <Form style={{padding:'30px',
                         paddingTop:'50px'}}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Email address</Form.Label>
-                    <Form.Control type="text" placeholder="Enter email" name="username" value={credentials.username} onChange={handleFormInputChange("username")}/>
-                        <Form.Text className="text-muted">
-                            We'll never share your email with anyone else.
-                        </Form.Text>
+                    <Form.Label>Korisničko ime</Form.Label>
+                    <Form.Control type="text" placeholder="Unesite korisničko ime..." name="username" value={credentials.username} onChange={handleFormInputChange("username")} required={true}/>
                 </Form.Group>
+                {errorUsername && <p style={{color:'red'}}>Molimo unesite korisničko ime!</p>}
                 <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" placeholder="Password" name="password" onChange={handleFormInputChange("password")}/>
+                    <Form.Label>Lozinka</Form.Label>
+                    <Form.Control type="password" placeholder="Unesite lozinku..." name="password" onChange={handleFormInputChange("password")} required/>
                 </Form.Group>
+                {errorPassword && <p style={{color:'red'}}>Molimo unesite lozinku!</p>}
                 <Button variant="primary" onClick={login}>
-                    Submit
+                    Prijava
                 </Button>
              </Form>
-             <div style={{width : '50%',
+             <div style={{width : '60%',
                     margin : 'auto',
-                paddingTop : '10px'}}>
-                {error && <p>Wrong username/password!</p>}
+                color:'red'}}>
+                {error && <p>Pogrešno korisničko ime i/ili lozinka!</p>}
              </div>
         </div>
     </div>

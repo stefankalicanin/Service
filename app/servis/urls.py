@@ -3,7 +3,7 @@ from servis import views
 
 urlpatterns = [
     path('HelloWorld', views.HelloWorld, name = "Hello World"),
-    path('admin/users', views.get_all_users_profile, name="Get all users profile"),
+    path('admin/users', views.get_all_clients_profile, name="Get all users profile"),
     path('user/register', views.register_user, name = "Register user"),
     path('repairer/register', views.register_repairer, name = "Register repair"),
     path('user/diagnostic_request', views.get_diagnostic_schedule_appointment, name="Request for diagnostics"),
@@ -28,6 +28,10 @@ urlpatterns = [
     path('user/order/device/<int:id>', views.get_order_by_device, name="Get order for device device"),
     path('user/report/<int:id>', views.generate_PDF, name="Generate report"),
     path('repairer/password', views.change_password_repairer, name="Change password repairer - first time login"),
-    path('user/profile/<int:id>', views.get_one_user, name="Get one user")
+    path('user/profile/<int:id>', views.get_one_user, name="Get one user"),
+    path('user/profile/edit', views.edit_user_profile, name="Edit profile data"),
+    path('admin/create/category', views.create_category, name="Create category"),
+    path('admin/create/device', views.create_device, name="Create device"),
+    path('admin/users/profiles', views.get_all_users_profile, name="All users profiles")
 
 ]
