@@ -114,19 +114,11 @@ function UserDiagnosticRequest() {
     setCheckResponse(false)
   }
   return (
-    <div>
-      <div style= {{marginTop: '100px'
-                  }}>
-      <div style={{width : '40%',
-                    margin : 'auto',
-                    textAlign : 'center'
-                 }}>
+      <div>
+        <div style={{marginLeft:'150px', marginBottom:'50px'}}>
         <h3>Create diagnostic request</h3>
-      </div>
-      <div style={{width : '40%',
-                    margin : 'auto',
-                    marginTop : '50px'
-                 }}>
+        </div>
+      <div>
         <Form>
           <Form.Group className="mb-3" controlId="formBasicFirstName">
             <select className="form-select" aria-label="Default select example" onChange={chooseCategory} required={true}>
@@ -155,7 +147,7 @@ function UserDiagnosticRequest() {
         </Form.Group>}
         <Button variant="primary" onClick={sendRequest}>Submit</Button>
         {checkResponse  && 
-        <div style={{marginTop: '10px', border: '1px solid red'}}>
+        <div>
           {recommendedResponse && <p>The appointment is taken.Recommended appointment:</p>}
           <p>Start time: {validateResponse.start_time.slice(0,19)}</p>
           <p>End time: {validateResponse.end_time.slice(0,19)}</p>
@@ -163,7 +155,6 @@ function UserDiagnosticRequest() {
           <Button variant="danger" onClick={refuseRequest}>Refuse</Button>
         </div>} 
       </div>
-    </div>
     </div>
   )
 }

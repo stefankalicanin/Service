@@ -19,18 +19,36 @@ function ChangePassword() {
     confirmPassword : '',
     username : decoded_token.username
   })
+
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState()
+
   const handleFormInputChange = (name) => (event) => {
     const val = event.target.value;
     setUser({...user, [name] : val})
+    
   };
 
+  const togglePassword = () => {
+    setShowPassword(!showPassword)
+  }
+
   const changePassword = () => {
+    if (user.password !== user.confirmPassword) {
+      setError(true)
+      return;
+    }
+    else {
+      setError(false)
     axios.post('http://localhost:8000/api/repairer/password',
     {
       username : user.username,
       password : user.password
     })
   }
+  }
+
+  const buttonText = showPassword ? 'Hide password' : 'Show password';
 
   return (
     <div>
@@ -39,28 +57,38 @@ function ChangePassword() {
     }}>
         
     </div> 
-        <div style={{width : '30%',
+        <div style={{width : '50%',
                     height : '400px',
                     margin : 'auto',
                 marginTop : '150px',
                 backgroundColor:'#E4E9E1',
                 borderRadius:'25px',
                 border : '1px solid black'}}>
-                    <h1 style={{paddingLeft:'175px',paddingTop:'40px',backgroundColor:'#ffffff8c',borderRadius:'25px'
+                    <h1 style={{backgroundColor:'#ffffff8c',borderRadius:'25px', textAlign:'center'
                     }}>Change password</h1>
             <Form style={{padding:'30px',
                         paddingTop:'50px'}}>
                 <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>New password</Form.Label>
-                    <Form.Control type="text" placeholder="Enter password" name="password" value={user.password} onChange={handleFormInputChange("password")}/>
+                    <Form.Control type={showPassword ? "text":"password"} placeholder="Enter password" name="password" value={user.password} onChange={handleFormInputChange("password")}/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicConfirmPassword">
                     <Form.Label>Confirm new password</Form.Label>
-                    <Form.Control type="password" placeholder="Enter password" name="confirmPassword" value={user.confirmPassword} onChange={handleFormInputChange("confirmPassword")}/>
+                    <Form.Control type={showPassword ? "text":"password"} placeholder="Enter password" name="confirmPassword" value={user.confirmPassword} onChange={handleFormInputChange("confirmPassword")}/>
                 </Form.Group>
-                <Button variant="primary" onClick={changePassword}>
-                    Submit
-                </Button>
+                <div className='row'>
+                    <div className='col'>
+                      <Button variant="primary" onClick={changePassword}>
+                        Submit
+                      </Button>
+                    </div>
+                    <div className='col' style={{marginLeft:'410px'}}>
+                      <Button variant="danger" onClick={togglePassword}>
+                        {buttonText}
+                      </Button>
+                    </div>
+                </div>
+                {error && <p>Password and confirm password don't matched.</p>}
              </Form>
         </div>
     </div>

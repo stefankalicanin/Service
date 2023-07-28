@@ -26,7 +26,7 @@ class CategorySerializers(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = ['id', 'name', 'big_size']
+        fields = ['id', 'name', 'size']
 
         
 class DeviceSerializers(serializers.ModelSerializer):

@@ -18,8 +18,8 @@ def HelloWorld(request):
     return Response("Hello World", status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def get_all_users_profile(request):
-    return Response(UserProfileService.get_all_users_profiles(), status=status.HTTP_200_OK)
+def get_all_clients_profile(request):
+    return Response(UserProfileService.get_all_clients_profiles, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_one_user(request,id):
@@ -76,7 +76,7 @@ def register_repairer(request):
         gender = data['gender']
     )
 
-    user.set_password(data['password'])
+    user.set_password('123')
 
     repairer = Repairer (
         user = user,
@@ -338,7 +338,64 @@ def generate_PDF(request, id):
     pdf.save()
 
     return response
+
+@api_view(['POST'])
+def edit_user_profile(request):
+    data = json.loads(request.body)
+
+    id = data['id']
+
+    user = get_user_model().objects.get(id=id)
+    user.first_name = data['first_name']
+    user.last_name = data['last_name']
+    user.username = data['username']
+    user.gender = data['gender']
+    user.birthday = data['birthday']
     
 
+    user.save()
 
+    return Response(status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_category(request):
+    data = json.loads(request.body)
+
+    category = Category (
+       name = data['name'],
+       size = data['size']
+    )
+    category.save()
+
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def create_device(request):
+    data = json.loads(request.body)
     
+    if data['under_warranty'] == 'true':
+        under_warranty = True
+    else:
+        under_warranty = False
+    category = Category.objects.get(id=data['id_category'])
+    if data['id_main_device'] != None:
+        main_device = Device.objects.get(id=data['id_main_device'])
+    else:
+        main_device = None
+    device = Device (
+        name = data['name'],
+        description = data ['description'],
+        price = data['price'],
+        under_warranty = under_warranty,
+        quantity = data['quantity'],
+        category = category,
+        main_device = main_device
+    )
+
+    device.save()
+
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def get_all_users_profile(request):
+    return Response(UserService.get_all_users(), status=status.HTTP_200_OK)

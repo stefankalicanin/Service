@@ -40,7 +40,7 @@ async function login(userCredentials) {
 }
   }
 catch (error) {
-    return error.response.status;
+    return error;
   }
 }
 

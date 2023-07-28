@@ -43,6 +43,15 @@ const NavBar = () => {
       {role === 'ADMIN' && <Nav.Link href="/admin/register">
           Create a new repairer account
         </Nav.Link>}
+        {role === 'ADMIN' && <Nav.Link href="/admin/create/category">
+          Create category
+        </Nav.Link>}
+        {role === 'ADMIN' && <Nav.Link href="/admin/create/device">
+          Create device
+        </Nav.Link>}
+        {role === 'ADMIN' && <Nav.Link href="/admin/users/profiles">
+          Show users profiles
+        </Nav.Link>}
       {!TokenService.getToken() && <Nav.Link href="/user/register">
           Create a new account
       </Nav.Link> }

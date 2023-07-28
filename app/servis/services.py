@@ -25,13 +25,19 @@ class UserService:
 
         serializersCustomUser = CustomUserSerializers(user)
         return serializersCustomUser.data
+    
+    @staticmethod
+    def get_all_users():
+        users = get_user_model().objects.filter(~Q(role = CustomUser.Role.ADMIN))
+        print(users)
+        serializersCustomUsers = CustomUserSerializers(users, many=True)
+        return serializersCustomUsers.data
 
 class UserProfileService:
 
     @staticmethod
-    def get_all_users_profiles():
+    def get_all_clients_profiles():
         users_profiles = Client.objects.all()
-
         serializersUserProfile = UserProfileSerializers(users_profiles, many=True)
         return serializersUserProfile.data
 

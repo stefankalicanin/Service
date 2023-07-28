@@ -1,14 +1,21 @@
 import React from 'react'
 import {TokenService} from '../../services/TokenService'
 import RepairDiagnosticAppointment from './RepairDiagnosticAppointments'
-
+import UserProfile from '../User/UserProfile'
 function HomeRepaird() {
 
   const decoded_token = TokenService.decodeToken(TokenService.getToken());
 
   return (
     <div>
-     <RepairDiagnosticAppointment/> 
+    <div className='row'>
+      <div className='col-md-3'>
+        <UserProfile/>
+      </div>
+      <div className='col-md-6'>
+       <RepairDiagnosticAppointment/> 
+      </div>
+    </div>
     </div>
   )
 }
