@@ -26,8 +26,18 @@ function UserDiagnosticRequest() {
     axios.get('http://localhost:8000/api/user/all_categories')
     .then(response => {
       setCategory(response.data)
+      setCategorySize(response.data[0].size)
+      axios.get(`http://localhost:8000/api/user/all_device_by_category/${response.data[0].id}`)
+      .then(response=>{
+        setDevice(response.data)
+        setDiagnosticRequest({...diagnosticRequest, ["id_device"] : response.data[0].id})
+        
+      })
+      .catch(error=>{
+        console.log(error)
+      })
     })
-    .then(error => {
+    .catch(error => {
       console.log(error)
     })
   }, [])
@@ -38,7 +48,7 @@ function UserDiagnosticRequest() {
     const id = el.getAttribute('id')
     axios.get(`http://localhost:8000/api/user/category/${id}`)
     .then(response => {
-      setCategorySize(response.data.big_size)
+      setCategorySize(response.data.size)
     })
     .then(error => {
       console.log(error)
@@ -115,47 +125,52 @@ function UserDiagnosticRequest() {
   }
   return (
       <div>
-        <div style={{marginLeft:'150px', marginBottom:'50px'}}>
-        <h3>Create diagnostic request</h3>
-        </div>
-      <div>
-        <Form>
-          <Form.Group className="mb-3" controlId="formBasicFirstName">
+       <div style={{width : '100%',
+                height:'600px',
+                backgroundColor:'#E4E9E1',
+                borderRadius:'25px',
+                border : '1px solid black'
+            }}>
+        <h1 style={{paddingLeft:'70px',paddingTop:'40px',backgroundColor:'#ffffff8c',borderRadius:'25px'
+                }}>Kreiranje zahteva za dijagnostiku</h1>
+        <Form style={{padding:'30px',
+                        paddingTop:'10px'}}>
+          <Form.Group className="mb-3" controlId="formBasicCategory">
+            <Form.Label>Kategorija</Form.Label>
             <select className="form-select" aria-label="Default select example" onChange={chooseCategory} required={true}>
-              <option selected>Choose category</option>
               {category.map(c => 
               <option id = {c.id}>{c.name}</option>
               )}
             </select>
           </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicFirstName">
+          <Form.Group className="mb-3" controlId="formBasicDevice">
+            <Form.Label>Uredjaj</Form.Label>
             <select className="form-select" aria-label="Default select example" onChange={chooseDevice} required={true}>
-              <option selected>Choose device</option>
               {device.map(d => 
               <option id = {d.id}>{d.name}</option>
               )}
             </select>
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicDate">
-            <Form.Label>Date</Form.Label>
+            <Form.Label>Datum</Form.Label>
             <Form.Control type="datetime-local" name="date" value={diagnosticRequest.date} onChange={handleFormInputChange("date")} required={true}/>
           </Form.Group>    
         </Form>
-        {!category_size &&   
-        <Form.Group className="mb-3"  controlId="formBasicCheckbox">
-          <Form.Check type="checkbox"  label="House diagnostic" checked={isChecked} onChange={handleCheckBoxChange}/>
+        {category_size === 'BIG' &&   
+        <Form.Group className="mb-3"  controlId="formBasicCheckbox" style={{marginLeft:'30px'}}>
+          <Form.Check type="checkbox"  label="Kućna dijagnostika" checked={isChecked} onChange={handleCheckBoxChange}/>
         </Form.Group>}
-        <Button variant="primary" onClick={sendRequest}>Submit</Button>
+        <Button variant="primary" onClick={sendRequest} style={{marginLeft:'30px'}}>Kreiraj</Button>
         {checkResponse  && 
-        <div>
+        <div style={{marginLeft:'250px'}}>
           {recommendedResponse && <p>The appointment is taken.Recommended appointment:</p>}
-          <p>Start time: {validateResponse.start_time.slice(0,19)}</p>
-          <p>End time: {validateResponse.end_time.slice(0,19)}</p>
-          <Button variant="primary" onClick={confirmRequest}>Accept</Button>
-          <Button variant="danger" onClick={refuseRequest}>Refuse</Button>
+          <p><strong>Start time:</strong> {validateResponse.start_time.slice(0,19)}</p>
+          <p><strong>End time:</strong> {validateResponse.end_time.slice(0,19)}</p>
+          <Button variant="primary" onClick={confirmRequest}>Prihvati</Button>
+          <Button variant="danger" onClick={refuseRequest} style={{marginLeft:'75px'}}>Odbij</Button>
         </div>} 
       </div>
-    </div>
+   </div>
   )
 }
 

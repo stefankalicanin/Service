@@ -6,7 +6,7 @@ function CreateCategory() {
 
     const [category, setCategory] = useState({
         name : '',
-        size : ''
+        size : 'BIG'
     })
 
     const [error, setError] = useState({
