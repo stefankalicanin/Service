@@ -15,19 +15,19 @@ const NavBar = () => {
     <Navbar bg="dark" variant="dark">
        
       {role === 'ADMIN' && <Navbar.Brand as={Link} to="/admin/home">
-        Home
+      Početna
       </Navbar.Brand>} 
       {role === 'USER' && <Navbar.Brand href="/user/home">
-        Home
+      Početna
       </Navbar.Brand>}
       {role === 'REPAIR_DIAGNOSTIC' && <Navbar.Brand href="/repairerd/home">
-        Home
+      Početna
       </Navbar.Brand>}
       {role === 'REPAIR_TROUBLESHOOTING' && <Navbar.Brand href="/repairert/home">
-        Home
+      Početna
       </Navbar.Brand>}
       {role === null && <Navbar.Brand href="/">
-        Home
+      Početna
       </Navbar.Brand>}
     
      <Nav className = 'me-auto'>
@@ -37,31 +37,30 @@ const NavBar = () => {
         <Button className="btn-danger" onClick={() => AuthenticationService.logout()}>Log out</Button>
       ) : (
         <Nav.Link href="/login">
-          Sign up
+         Prijava
         </Nav.Link>
       )}
       {role === 'ADMIN' && <Nav.Link href="/admin/register">
-          Create a new repairer account
+          Registracija servisera
         </Nav.Link>}
         {role === 'ADMIN' && <Nav.Link href="/admin/create/category">
-          Create category
+          Kreiranje kategorije
         </Nav.Link>}
         {role === 'ADMIN' && <Nav.Link href="/admin/create/device">
-          Create device
+          Kreiranje uredjaja
         </Nav.Link>}
         {role === 'ADMIN' && <Nav.Link href="/admin/users/profiles">
-          Show users profiles
+          Prikaz profila korisnika
         </Nav.Link>}
       {!TokenService.getToken() && <Nav.Link href="/user/register">
-          Create a new account
+          Registracija
       </Nav.Link> }
       {role === 'USER' && <NavDropdown title="Requests" id="nav-dropdown">
-        <NavDropdown.Item eventKey="4.1" href="/user/diagnostic_requests/done">Done diagnostic requests</NavDropdown.Item>
-        <NavDropdown.Item eventKey="4.2" href="/user/diagnostic_requests/wait">Wait diagnostic requests</NavDropdown.Item>
-        <NavDropdown.Item eventKey="4.3" href="/user/troubleshooting_requests/done">Done troubleshooting requests</NavDropdown.Item>
-        <NavDropdown.Item eventKey="4.3" href="/user/troubleshooting_requests/wait">Wait troubleshooting requests</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.1" href="/user/diagnostic_requests/done">Zahtevi za dijagnostiku - završeni</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.2" href="/user/diagnostic_requests/wait">Zahtevi za dijagnostiku - na čekanju</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.3" href="/user/troubleshooting_requests/done">Zahtevi za popravku - završeni</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.3" href="/user/troubleshooting_requests/wait">Zahtevi za popravku - na čekanju</NavDropdown.Item>
         <NavDropdown.Divider />
-        <NavDropdown.Item eventKey="4.4">Separated link</NavDropdown.Item>
       </NavDropdown>} 
      </Nav> 
     

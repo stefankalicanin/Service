@@ -15,7 +15,7 @@ function ShowProfile() {
     .catch(error=> {
       console.log(error)
     })
-  })
+  }, [])
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
       {users.map(u=> (
@@ -38,6 +38,9 @@ function ShowProfile() {
         <Card.Text>
           <strong>Datum rodjenja:</strong> {u.birthday}
         </Card.Text>
+        <Card.Text>
+          <strong>Uloga:</strong> {u.role}
+        </Card.Text> 
       </Card.Body>
     </Card>
     ))}

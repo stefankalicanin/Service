@@ -4,39 +4,38 @@ import { Form } from 'react-bootstrap'
 import {Button} from 'react-bootstrap'
 function CreateDevice() {
 
+    const [category, setCategory] = useState([])
+
     const [device, setDevice] = useState({
         name : '',
         description: '',
         price : '',
-        under_warranty : null,
+        under_warranty : 'true',
         quantity : '',
         id_category : null,
         id_main_device : null
     })
 
-    const [category, setCategory] = useState([])
     const [mainDevice, setMainDevice] = useState([])
     useEffect(()=> {
         axios.get('http://localhost:8000/api/user/all_categories')
         .then(response => {
             setCategory(response.data)
+            setDevice({...device, ["id_category"]:response.data[0].id})
+            console.log("Category:", response.data)
+            axios.get(`http://localhost:8000/api/user/all_device_by_category/${response.data[0].id}`)
+            .then(response=>{
+            setMainDevice(response.data)
+            console.log("Main device", response.data)
+        })
+        .catch(error=>{
+            console.log(error)
+        })
         })
         .catch(error=> {
             console.log(error)
         })
     }, [])
-
-    useEffect(()=> {
-        axios.get(`http://localhost:8000/api/user/all_device_by_category/${device.id_category}`)
-        .then(response=> {
-            console.log(response.data)
-            setMainDevice(response.data)
-        })
-        .catch(error=>{
-            console.log(error)
-        })
-    }, [])
-
     
     const createDevice = () => {
         axios.post('http://localhost:8000/api/admin/create/device',
@@ -54,6 +53,7 @@ function CreateDevice() {
         setDevice({...device, [name]:val})
     }
 
+
     const chooseCategory = (e) => {
         const index = e.target.selectedIndex
         const el = e.target.childNodes[index]
@@ -62,6 +62,7 @@ function CreateDevice() {
         axios.get(`http://localhost:8000/api/user/all_device_by_category/${id}`)
           .then(response => {
             setMainDevice(response.data)
+            console.log("Device", response.data)
           })
           .catch(error => {
             console.log(error)
