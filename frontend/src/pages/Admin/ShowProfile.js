@@ -16,8 +16,21 @@ function ShowProfile() {
       console.log(error)
     })
   }, [])
+
+  const handleRole = (role) => {
+    if (role === 'USER') {
+      return 'Korisnik'
+    }
+    if (role === 'REPAIR_DIAGNOSTIC') {
+      return 'Serviser za dijagnostiku'
+    }
+    if (role === 'REPAIR_TROUBLESHOOTING') {
+      return 'Serviser za popravku'
+    }
+  }
+
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'normal' }}>
       {users.map(u=> (
          <Card key={u.id} style={{ width: '300px', margin: '10px' }}>
       <Card.Body>
@@ -39,7 +52,7 @@ function ShowProfile() {
           <strong>Datum rodjenja:</strong> {u.birthday}
         </Card.Text>
         <Card.Text>
-          <strong>Uloga:</strong> {u.role}
+          <strong>Uloga:</strong> {handleRole(u.role)}
         </Card.Text> 
       </Card.Body>
     </Card>

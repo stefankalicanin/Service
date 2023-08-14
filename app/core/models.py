@@ -13,8 +13,8 @@ class CustomUser(AbstractUser):
         REPAIR_TROUBLESHOOTING = "REPAIR_TROUBLESHOOTING"
 
     class Gender(models.TextChoices):
-        M = "Male"
-        F = "Female"
+        M = "Muški"
+        F = "Ženski"
 
     role = models.CharField(max_length=25, choices=Role.choices)
     gender = models.CharField(max_length=6, choices=Gender.choices)

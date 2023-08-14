@@ -46,6 +46,8 @@ function UserProfile() {
       axios.post('http://localhost:8000/api/user/profile/edit', editUser)
       .then(response => {
         console.log(response.data)
+        window.alert("Uspešno izmenjeni podaci")
+        window.location.reload();
       })
       .catch(error=> {
         console.log(error)
