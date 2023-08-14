@@ -9,8 +9,8 @@ function RegisterRepair() {
     last_name : '',
     username : '',
     birthday : '',
-    gender : '',
-    type : '',
+    gender : 'Muški',
+    type : 'REPAIR_DIAGNOSTIC',
     country : '',
     city : '',
     address : '',
@@ -91,8 +91,8 @@ function RegisterRepair() {
                 <Form.Group className="mb-3" controlId="formBasicGender">
                     <Form.Label>Pol</Form.Label>
                 <Form.Select aria-label="Default select example" name="gender" value={user.gender} onChange={handleFormInputChange("gender")}>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
+                    <option value="Muški">Muški</option>
+                    <option value="Ženski">Ženski</option>
                 </Form.Select>
                 </Form.Group> 
                 </div>
@@ -108,8 +108,8 @@ function RegisterRepair() {
                 <Form.Group className="mb-3" controlId="formBasicType">
                    <Form.Label>Tip servisera</Form.Label> 
                 <Form.Select aria-label="Default select example" name="type" value={user.type} onChange={handleFormInputChange("type")}>
-                    <option value={"REPAIR_DIAGNOSTIC"}>For diagnostics</option>
-                    <option value={"REPAIR_TROUBLESHOOTING"}>For repair</option>
+                    <option value={"REPAIR_DIAGNOSTIC"}>Za dijagnostiku</option>
+                    <option value={"REPAIR_TROUBLESHOOTING"}>Za popravku</option>
                 </Form.Select>
                 </Form.Group>
                 </div>
@@ -156,7 +156,7 @@ function RegisterRepair() {
                     </div> 
                 </div>
                 <Button variant="primary" onClick={register}>
-                    Submit
+                    Registracija
                 </Button>
              </Form>
         </div>

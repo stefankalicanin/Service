@@ -3,21 +3,16 @@ import { TokenService } from '../../services/TokenService'
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios'
-import { AuthenticationService } from '../../services/AuthenticationService';
 
 function ChangePassword() {
 
   const decoded_token = TokenService.decodeToken(TokenService.getToken())
-  const role = AuthenticationService.getRole()
- 
-  if (role === 'USER' || role === 'ADMIN')
-  {
-    AuthenticationService.logout();
-  }
+  const username = decoded_token.username;
+
   const [user, setUser] = useState({
     password : '',
     confirmPassword : '',
-    username : decoded_token.username
+    username : username
   })
 
   const [showPassword, setShowPassword] = useState(false)
@@ -45,10 +40,17 @@ function ChangePassword() {
       username : user.username,
       password : user.password
     })
+    .then(res => {
+      TokenService.removeToken();
+      window.location.assign("/login")
+    })
+    .catch(error => {
+      console.log(error)
+    })
   }
   }
 
-  const buttonText = showPassword ? 'Hide password' : 'Show password';
+  const buttonText = showPassword ? 'Sakrij lozinku' : 'Prikaži lozinku';
 
   return (
     <div>
@@ -65,21 +67,21 @@ function ChangePassword() {
                 borderRadius:'25px',
                 border : '1px solid black'}}>
                     <h1 style={{backgroundColor:'#ffffff8c',borderRadius:'25px', textAlign:'center'
-                    }}>Change password</h1>
+                    }}>Promena lozinke</h1>
             <Form style={{padding:'30px',
                         paddingTop:'50px'}}>
                 <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>New password</Form.Label>
+                    <Form.Label>Nova lozinka</Form.Label>
                     <Form.Control type={showPassword ? "text":"password"} placeholder="Enter password" name="password" value={user.password} onChange={handleFormInputChange("password")}/>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicConfirmPassword">
-                    <Form.Label>Confirm new password</Form.Label>
+                    <Form.Label>Potvrdite novu lozinku</Form.Label>
                     <Form.Control type={showPassword ? "text":"password"} placeholder="Enter password" name="confirmPassword" value={user.confirmPassword} onChange={handleFormInputChange("confirmPassword")}/>
                 </Form.Group>
                 <div className='row'>
                     <div className='col'>
                       <Button variant="primary" onClick={changePassword}>
-                        Submit
+                        Potvrda
                       </Button>
                     </div>
                     <div className='col' style={{marginLeft:'410px'}}>
@@ -88,7 +90,7 @@ function ChangePassword() {
                       </Button>
                     </div>
                 </div>
-                {error && <p>Password and confirm password don't matched.</p>}
+                {error && <p>Lozinke se ne poklapaju.</p>}
              </Form>
         </div>
     </div>
