@@ -18,6 +18,7 @@ import ChangePassword from './pages/Home/ChangePassword';
 import CreateCategory from './pages/Admin/CreateCategory';
 import CreateDevice from './pages/Admin/CreateDevice';
 import ShowProfile from './pages/Admin/ShowProfile';
+import RepairerProfiles from './pages/User/RepairerProfiles';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 
@@ -46,6 +47,7 @@ function App() {
           <Route path= '/admin/create/category' element={<CreateCategory/>}/>
           <Route path= '/admin/create/device' element={<CreateDevice/>}/>
           <Route path= '/admin/users/profiles' element={<ShowProfile/>}/>
+          <Route path= '/user/repairer/profiles' element={<RepairerProfiles/>}/>
 
         </Routes>
       </BrowserRouter>

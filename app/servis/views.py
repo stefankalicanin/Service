@@ -6,6 +6,7 @@ from django.utils.dateparse import parse_datetime
 from django.contrib.auth import get_user_model
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
+from django.db.models import Q
 
 import json
 import os
@@ -399,3 +400,19 @@ def create_device(request):
 @api_view(['GET'])
 def get_all_users_profile(request):
     return Response(UserService.get_all_users(), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def change_password_user(request):
+    data = json.loads(request.body)
+    User = get_user_model()
+    user = User.objects.get(username=data['username'])
+    if user.check_password(data['current_password']):
+        user.set_password(data['new_password'])
+        user.save()
+        return Response({}, status=status.HTTP_200_OK)
+    else:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def repairer_profiles(request):
+    return Response(RepairerService.get_all_repairers(), status=status.HTTP_200_OK)

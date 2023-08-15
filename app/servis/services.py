@@ -68,6 +68,12 @@ class RepairerService:
         serializersRepairerProfile = RepairerProfileSerializers(repairer_profile)
         return serializersRepairerProfile.data
     
+    @staticmethod
+    def get_all_repairers():
+        users = get_user_model().objects.filter(Q(role=CustomUser.Role.REPAIR_DIAGNOSTIC) | Q(role=CustomUser.Role.REPAIR_TROUBLESHOOTING))
+
+        serializersUsers= CustomUserSerializers(users, many=True)
+        return serializersUsers.data
 
 class DiagnosticsRequestService:
 

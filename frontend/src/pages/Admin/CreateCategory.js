@@ -9,9 +9,6 @@ function CreateCategory() {
         size : 'BIG'
     })
 
-    const [error, setError] = useState({
-        name : false
-    })
 
     const handleFormInputChange = (name) => (event) => {
         const val = event.target.value;
@@ -19,13 +16,12 @@ function CreateCategory() {
     }
 
     const createCategory = () => {
-        if(category.name.trim() === '') {
-            setError({...error, ["name"]:true})
-            return;
-        }
+        if(category.name === "") {return;}
         axios.post('http://localhost:8000/api/admin/create/category', category)
         .then(response => {
             console.log(response.data)
+            window.alert("Uspešno")
+            window.location.reload()
         })
         .catch(error => {
             console.log(error)
@@ -52,9 +48,14 @@ function CreateCategory() {
                         paddingTop:'10px'}}>
                 <Form.Group className="mb-3" controlId="formBasicName">
                     <Form.Label>Naziv</Form.Label>
-                    <Form.Control type="text" placeholder="Unesite naziv..." name="name" value={category.name} onChange={handleFormInputChange("name")}/>
+                    <Form.Control type="text" placeholder="Unesite naziv..." name="name" value={category.name} onChange={handleFormInputChange("name")} required/>
+                    {category.name === "" && (
+                        <Form.Text className="text-danger">
+                            Molimo unesite naziv kategorije!
+                        </Form.Text>
+                    )}
                 </Form.Group>
-                {error.name && <p style={{color:'red'}}>Molimo unesite naziv kategorije!</p>}
+        
                 <Form.Group>
                     <Form.Label>Unesite veličinu </Form.Label>
                 <Form.Select aria-label="Default select example" name="type" value={category.size} onChange={handleFormInputChange("size")}>

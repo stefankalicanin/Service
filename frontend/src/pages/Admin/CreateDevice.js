@@ -38,10 +38,13 @@ function CreateDevice() {
     }, [])
     
     const createDevice = () => {
+        if(device.name === "" || device.description === "" || device.price === "" || device.quantity === "" ) {return;}
         axios.post('http://localhost:8000/api/admin/create/device',
         device)
         .then(response=> {
             console.log(response.data)
+            window.alert("Uspešno")
+            window.location.reload()
         })
         .catch(error=> {
             console.log(error)
@@ -75,7 +78,7 @@ function CreateDevice() {
 }}>
     </div> 
     <div style={{width : '40%',
-                height:'550px',
+                height:'580px',
                 margin : 'auto',
                 marginTop:'50px',
                 backgroundColor:'#E4E9E1',
@@ -88,17 +91,32 @@ function CreateDevice() {
                         paddingTop:'10px'}}>
             <Form.Group className="mb-3" controlId="formBasicName">
                     <Form.Label>Naziv</Form.Label>
-                    <Form.Control type="text" placeholder="Unesite naziv..." name="name" value={device.name} onChange={handleFormInputChange("name")}/>
+                    <Form.Control type="text" placeholder="Unesite naziv..." name="name" value={device.name} onChange={handleFormInputChange("name")} required/>
+                    {device.name === "" && (
+        <Form.Text className="text-danger">
+            Molimo unesite naziv!
+        </Form.Text>
+    )}
                 </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicDescription">
                     <Form.Label>Opis</Form.Label>
-                    <Form.Control type="text" placeholder="Unesite opis..." name="description" value={device.description} onChange={handleFormInputChange("description")}/>
+                    <Form.Control type="text" placeholder="Unesite opis..." name="description" value={device.description} onChange={handleFormInputChange("description")} requred/>
+                    {device.description === "" && (
+        <Form.Text className="text-danger">
+            Molimo unesite opis!
+        </Form.Text>
+                    )}
             </Form.Group>
             <div className='row'>
                 <div className='col'>
             <Form.Group className="mb-3" controlId="formBasicPrice">
                     <Form.Label>Cena (€)</Form.Label>
-                    <Form.Control type="number" placeholder="Unesite cenu..." name="name" value={device.price} onChange={handleFormInputChange("price")}/>
+                    <Form.Control type="number" placeholder="Unesite cenu..." name="name" value={device.price} onChange={handleFormInputChange("price")} required min="1"/>
+                    {device.price === "" && (
+                        <Form.Text className="text-danger">
+                            Molimo unesite cenu!
+                        </Form.Text>
+                    )}
             </Form.Group>
             </div>
             <div className='col'>
@@ -113,7 +131,12 @@ function CreateDevice() {
             <div className='col'>
             <Form.Group className="mb-3" controlId="formBasicQuantity">
                     <Form.Label>Količina</Form.Label>
-                    <Form.Control type="number" placeholder="Unesite količinu" name="name" value={device.quantity} onChange={handleFormInputChange("quantity")}/>
+                    <Form.Control type="number" placeholder="Unesite količinu" name="name" value={device.quantity} onChange={handleFormInputChange("quantity")} required min="1"/>
+                    {device.quantity === "" && (
+                        <Form.Text className="text-danger">
+                            Molimo unesite količinu!
+                        </Form.Text>
+                    )}
             </Form.Group>
             </div>
             </div>

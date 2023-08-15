@@ -1,0 +1,60 @@
+import React from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { Card, Image } from 'react-bootstrap';
+import user_information from '../Home/img/user_information.png'
+function RepairerProfiles() {
+
+  const [users, setUsers] = useState([])
+    useEffect(()=> {
+        axios.get('http://localhost:8000/api/user/repairer/profiles')
+        .then(response => {
+            console.log(response.data)
+            setUsers(response.data)
+        })
+        .catch(error =>{
+            console.log(error)
+        })
+    }, [])
+
+    const handleRole = (role) => {
+      if (role === 'REPAIR_DIAGNOSTIC') {
+        return 'Serviser za dijagnostiku'
+      }
+      if (role === 'REPAIR_TROUBLESHOOTING') {
+        return 'Serviser za popravku'
+      }
+    }
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'normal' }}>
+      {users.map(u=> (
+         <Card key={u.id} style={{ width: '300px', margin: '10px' }}>
+      <Card.Body>
+        <Image src={user_information} roundedCircle style={{ width: '200px', height: '200px', marginBottom: '10px' }} />
+        <Card.Title>Profil korisnika</Card.Title>
+        <Card.Text>
+          <strong>Ime:</strong> {u.first_name}
+        </Card.Text>
+        <Card.Text>
+          <strong>Prezime:</strong> {u.last_name}
+        </Card.Text>
+        <Card.Text>
+          <strong>Korisničko ime:</strong> {u.username}
+        </Card.Text>
+        <Card.Text>
+          <strong>Pol:</strong> {u.gender}
+        </Card.Text>
+        <Card.Text>
+          <strong>Datum rodjenja:</strong> {u.birthday}
+        </Card.Text>
+        <Card.Text>
+          <strong>Uloga:</strong> {handleRole(u.role)}
+        </Card.Text> 
+      </Card.Body>
+    </Card>
+    ))}
+    </div>
+  )
+}
+
+export default RepairerProfiles

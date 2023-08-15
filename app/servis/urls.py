@@ -32,6 +32,8 @@ urlpatterns = [
     path('user/profile/edit', views.edit_user_profile, name="Edit profile data"),
     path('admin/create/category', views.create_category, name="Create category"),
     path('admin/create/device', views.create_device, name="Create device"),
-    path('admin/users/profiles', views.get_all_users_profile, name="All users profiles")
+    path('admin/users/profiles', views.get_all_users_profile, name="All users profiles"),
+    path('user/password/change', views.change_password_user, name="Change user password"),
+    path('user/repairer/profiles', views.repairer_profiles, name="Repairer profiles")
 
 ]
