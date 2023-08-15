@@ -61,7 +61,10 @@ const NavBar = () => {
         <NavDropdown.Item eventKey="4.3" href="/user/troubleshooting_requests/done">Zahtevi za popravku - završeni</NavDropdown.Item>
         <NavDropdown.Item eventKey="4.3" href="/user/troubleshooting_requests/wait">Zahtevi za popravku - na čekanju</NavDropdown.Item>
         <NavDropdown.Divider />
-      </NavDropdown>} 
+      </NavDropdown>}
+      {role === 'USER' && <Nav.Link href="/user/repairer/profiles">
+        Prikaz profila servisera
+        </Nav.Link>} 
      </Nav> 
     
      

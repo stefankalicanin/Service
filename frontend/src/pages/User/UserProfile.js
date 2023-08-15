@@ -12,20 +12,28 @@ function UserProfile() {
 
     const decoded_token = TokenService.decodeToken(TokenService.getToken())
     const [showModal, setShowModal] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const buttonText = showPassword ? 'Sakrij lozinku' : 'Prikaži lozinku';
+    const [showPasswordModal, setShowPasswordModal] = useState(false)
     const [user, setUser] = useState({
       first_name : '',
       last_name : '',
       username : '',
-      gender : '',
+      gender : 'Muški',
       birthday : ''
     })
     const [editUser, setEditUser] = useState({
       first_name : '',
       last_name : '',
-      username : '',
       gender : '',
       birthday : ''
     })
+    const [changePasswordData, setChangePasswordData] = useState({
+      username: decoded_token.username,
+      current_password : '',
+      new_password:''
+    })
+    const [error, setError] = useState(false)
     useEffect(() => {
       axios.get(`http://localhost:8000/api/user/profile/${decoded_token.user_id}`)
       .then(response  => {
@@ -61,6 +69,39 @@ function UserProfile() {
       setEditUser({...user});
     }
 
+    const handlePasswordData = (name) => (event) => {
+      const val = event.target.value;
+      setChangePasswordData({...changePasswordData, [name] : val})
+    }
+
+    const changePassword = () => {
+      setShowPasswordModal(true);
+      setError(false)
+    }
+
+    const handleChangePassword = () => {
+      axios.post('http://localhost:8000/api/user/password/change', changePasswordData)
+      .then(response=> {
+        console.log(response.data)
+        window.alert('Uspesno')
+        setShowPasswordModal(false)
+      }
+      )
+      .catch(error=>{
+        if(error.response.status === 404) {
+          setError(true)
+        }
+        else 
+        {
+          setError(false)
+        }
+      })
+    }
+
+    const togglePassword = () => {
+      setShowPassword(!showPassword)
+    }
+
   return (
     <div>
          <Card>
@@ -83,6 +124,7 @@ function UserProfile() {
           <strong>Datum rodjenja:</strong> {user.birthday}
         </Card.Text>
         <Button onClick={handleEditProfile}>Izmeni profil</Button>
+        <Button className='btn-danger' style={{marginLeft:'80px'}} onClick={changePassword}>Izmeni lozinku</Button>
       </Card.Body>
     </Card>
     <Modal show={showModal} onHide={()=>setShowModal(false)}>
@@ -103,16 +145,13 @@ function UserProfile() {
                 </Form.Group>
       </Form>
       <Form>
-                <Form.Group className="mb-3" controlId="formBasicUsername">
-                    <Form.Label>Username</Form.Label>
-                    <Form.Control type="text" placeholder="Enter username" name="username" value={editUser.username} onChange={handleFormInputChange("username")}/>
-                </Form.Group>
-      </Form>
-      <Form>
-                <Form.Group className="mb-3" controlId="formBasicGender">
-                    <Form.Label>Gender</Form.Label>
-                    <Form.Control type="text" placeholder="Enter gender" name="gender" value={editUser.gender} onChange={handleFormInputChange("gender")}/>
-                </Form.Group>
+      <Form.Group className="mb-3" controlId="formBasicGender">
+                    <Form.Label>Pol</Form.Label>
+                <Form.Select aria-label="Default select example" name="gender" value={editUser.gender} onChange={handleFormInputChange("gender")}>
+                    <option value="Muški">Muški</option>
+                    <option value="Ženski">Ženski</option>
+                </Form.Select>
+                </Form.Group> 
       </Form>
       <Form>
                 <Form.Group className="mb-3" controlId="formBasicBirthday">
@@ -124,6 +163,32 @@ function UserProfile() {
       </Modal.Body>
       <Modal.Footer>
         <Button variant='danger' onClick={()=>setShowModal(false)}>Izadji</Button>
+      </Modal.Footer>
+    </Modal>
+    <Modal show={showPasswordModal} onHide={()=>setShowPasswordModal(false)}>
+      <Modal.Header closeButton onClick={() => setShowPasswordModal(!showPasswordModal)}>
+        <Modal.Title>Promena lozinke</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+      <Form>
+                <Form.Group className="mb-3" controlId="formBasicCurrentPassword">
+                    <Form.Label>Trenutna lozinka</Form.Label>
+                    <Form.Control type={showPassword ? 'text':'password'} placeholder="Unesite trenutnu lozinku" name="current_password" value={changePassword.currentPassword} onChange={handlePasswordData("current_password")} />
+                </Form.Group>
+      </Form>
+      <Form>
+                <Form.Group className="mb-3" controlId="formBasicNewPassword">
+                    <Form.Label>Nova lozinka</Form.Label>
+                    <Form.Control type={showPassword ? 'text':'password'} placeholder="Unesite novu lozinku" name="new_password" value={changePassword.newPassword} onChange={handlePasswordData("new_password")} />
+                </Form.Group>
+      
+      </Form>
+      {error && <p>Pogrešno uneta trenutna lozinka!</p>}
+      <Button onClick={handleChangePassword}>Potvrdi</Button>
+      <Button variant='danger' onClick={togglePassword} style={{marginLeft:'260px'}}>{buttonText}</Button>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant='danger' onClick={()=>setShowPasswordModal(false)}>Izadji</Button>
       </Modal.Footer>
     </Modal>
     </div>
