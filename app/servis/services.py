@@ -86,7 +86,9 @@ class DiagnosticsRequestService:
 
     @staticmethod
     def get_wait_diagnostic_requests_by_user(id):
-        diagnostic_request = DiagnosticsRequest.objects.all().filter(Q(user_id=id, schedule_appointment__is_done=False))
+        user = get_user_model().objects.get(id=id)
+        client = Client.objects.get(user=user)
+        diagnostic_request = DiagnosticsRequest.objects.all().filter(Q(client=client, schedule_appointment__is_done=False))
 
         serializersDiagnosticRequest = DiagnosticsRequestSerializers(diagnostic_request, many=True)
         return serializersDiagnosticRequest.data
@@ -220,7 +222,9 @@ class DiagnosticReportService:
 
     @staticmethod
     def get_done_diagnostic_requests_by_user(id):
-        diagnostic_request = DiagnosticsRequest.objects.all().filter(Q(user_id=id,schedule_appointment__is_done=True, ready_for_repair=False))
+        user = get_user_model().objects.get(id=id)
+        client = Client.objects.get(user=user)
+        diagnostic_request = DiagnosticsRequest.objects.all().filter(Q(client=client,schedule_appointment__is_done=True))
         diagnostic_report = DiagnosticReport.objects.all().filter(diagnostic_request__in=diagnostic_request)
 
         serializersDiagnosticReport = DiagnosticReportSerializers(diagnostic_report, many=True)

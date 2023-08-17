@@ -58,12 +58,11 @@ class ScheduleAppointmentSerializers(serializers.ModelSerializer):
 class DiagnosticsRequestSerializers(serializers.ModelSerializer):
 
     device = DeviceSerializers()
-    user = CustomUserSerializers()
     schedule_appointment = ScheduleAppointmentSerializers()
 
     class Meta:
         model = DiagnosticsRequest
-        fields = ['id', 'date', 'device', 'user', 'schedule_appointment']
+        fields = ['id', 'date', 'device','type_house',  'schedule_appointment']
 
 class TroubleshootingSerializers(serializers.ModelSerializer):
 
@@ -85,12 +84,11 @@ class PricingSerializers(serializers.ModelSerializer):
 class DiagnosticReportSerializers(serializers.ModelSerializer):
 
     diagnostic_request = DiagnosticsRequestSerializers()
-    device = DeviceSerializers()
-    price = PricingSerializers()
-
+    
+    
     class Meta:
         model = DiagnosticReport
-        fields = ['id', 'description', 'device', 'diagnostic_request', 'price']
+        fields = ['id', 'description', 'state', 'diagnostic_request', 'broken_device']
 
 
 class OrderSerializers(serializers.ModelSerializer):

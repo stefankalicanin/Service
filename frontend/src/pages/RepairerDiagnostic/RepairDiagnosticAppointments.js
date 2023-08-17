@@ -13,7 +13,9 @@ function RepairDiagnosticAppointments() {
  const [showModal, setShowModal] = useState(false)
  const [diagnosticReport, setDiagnosticReport] = useState({})
  const [device, setDevice] = useState([])
-
+ const[other, setOther] = useState(false)
+ const[check, setCheck] = useState(false)
+ 
  useEffect(() => {
   axios.get(`http://localhost:8000/api/repairer/profile/${decoded_token.user_id}`)
   .then(response => {
@@ -46,12 +48,13 @@ function RepairDiagnosticAppointments() {
   axios.post('http://localhost:8000/api/user/diagnostic_report',
   {
     "description" : diagnosticReport.description,
-    "id_device": diagnosticReport.id_device,
-    "id_diagnostic" : diagnosticReport.id
+    "state": check,
+    "id_diagnostic" : diagnosticReport.id,
+    "broken_device": diagnosticReport.broken_device
   })
   .then(res => {
     alert("Successfully created diagnostic report")
-    window.location.assign('/repairerd/diagnostic_schedule_appointments')
+    window.location.reload()
   })
  }
  const initModal = (diagnostic_schedule_appointment) => {
@@ -72,26 +75,48 @@ const handleFormInputChange = (name) => (event) => {
   
 };
 const chooseDevice = (e) => {
-  const index = e.target.selectedIndex
-  const el = e.target.childNodes[index]
-  const id = el.getAttribute('id')
-  setDiagnosticReport({...diagnosticReport, ["id_device"] : id})
+  
+  const selectedDevice = e.target.value;
+  if (selectedDevice === 'other')
+  {
+    setOther(true)
+  }
+  else
+  {
+    setDiagnosticReport({...diagnosticReport, ["broken_device"]:selectedDevice})
+  }
+}
+
+const handleTypeDiagnostic = (type) => {
+  if(type === 'HOUSE') {
+    return 'Kućna dijagnostika'
+  }
+  else 
+  {
+    return 'U servisu'
+  }
+}
+
+const handleCheckBoxChange = () => {
+  setCheck(!check)
 }
   return (
     <div>
       {!checkTableEmpty &&
-      <div style={{width : '70%',
+      <div style={{
                     margin : 'auto',
-                    marginTop : '100px'
+                    marginTop : '100px',
+                    marginLeft:'90px'
                 }}>
- 
+  <h1 style={{marginBottom:'40px', marginLeft:'170px'}}>Pregled zahteva za dijagnostiku</h1>
   <table class="table table-dark">
   <thead>
     <tr>
-      <th scope="col">Start time</th>
-      <th scope="col">End time</th>
-      <th scope="col">Device</th>
-      <th scope="col">Category</th>
+      <th scope="col">Početak</th>
+      <th scope="col">Kraj</th>
+      <th scope="col">Uredjaj</th>
+      <th scope="col">Kategorija</th>
+      <th scope="col">Tip</th>
       <th scope="col">Report</th>
     </tr>
   </thead>
@@ -102,7 +127,9 @@ const chooseDevice = (e) => {
       <th>{dsa.schedule_appointment.end_time.replace('T', ' ').replace('Z', '')}</th>
       <th>{dsa.device.name}</th>
       <th>{dsa.device.category.name}</th>
-      <th><Button variant="success" onClick={() => initModal(dsa)}>Write report</Button></th>
+      <th>{handleTypeDiagnostic(dsa.type_house)}</th>
+      <th>{dsa.type_house === 'IN SERVICE' ?<Button variant="success" onClick={() => initModal(dsa)}>Napiši izveštaj</Button>
+      :<Button className="btn-danger">Putni nalog</Button>}</th>
     </tr>
    ))}
   </tbody>
@@ -111,28 +138,41 @@ const chooseDevice = (e) => {
 </div>}
 <Modal show={showModal}>
         <Modal.Header closeButton onClick={()=> setShowModal(!showModal)}>
-          <Modal.Title>Create dagnostic report</Modal.Title>
+          <Modal.Title>Kreiranje izveštaja o dijagnostici</Modal.Title>
         </Modal.Header>
         <Modal.Body>
         <Form>
                 <Form.Group className="mb-3" controlId="formBasicDescription">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control type="text" placeholder="Enter description" name="description" value={diagnosticReport.description} onChange={handleFormInputChange("description")}/>
+                    <Form.Label>Opis</Form.Label>
+                    <Form.Control type="text" placeholder="Unesite opis dijagnostike..." name="description" value={diagnosticReport.description} onChange={handleFormInputChange("description")}
+                    />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicType">
-                <select className="form-select" aria-label="Default select example" onChange={chooseDevice} required={true}>
-              <option selected>Choose device</option>
+                <Form.Label>Pokvareni uredjaj</Form.Label>
+                <select className="form-select" aria-label="Default select example" onChange={chooseDevice} required={true}
+                >
+                  <option value="empty">Selektuj</option>
               {device.map(c => 
-              <option id = {c.id}>{c.name}</option>
+              <option value={c.name}>{c.name}</option>
               )}
+              <option value="other">Drugi uredjaj</option>
             </select>
                 </Form.Group>
+                {other && <Form.Group className="mb-3" controlId="formBasicNewDevice">
+                    <Form.Label>Naziv uredjaja</Form.Label>
+                    <Form.Control type="text" placeholder="Unesite naziv uredjaja..." name="description" value={diagnosticReport.broken_device} onChange={handleFormInputChange("broken_device")}
+                    />
+                    <Form.Text>Dodajte novi pokvareni uredjaj.</Form.Text>
+                </Form.Group>}
+                <Form.Group className="mb-3"  controlId="formBasicCheckbox" checked={check} onChange={handleCheckBoxChange}>
+          <Form.Check type="checkbox"  label="Uspešno obavljena dijagnostika" />
+        </Form.Group>
         </Form>
-        <Button variant="success" onClick={()=> diagnosticScheduleAppointmentDone(diagnosticReport.id)}>Confirm</Button>
+        <Button variant="success" onClick={()=> diagnosticScheduleAppointmentDone(diagnosticReport.id)}>Potvrdi</Button>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={()=> setShowModal(!showModal)}>
-            Close
+            Zatvori
           </Button>
         </Modal.Footer>
       </Modal>

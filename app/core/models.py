@@ -144,7 +144,7 @@ class DiagnosticReport(models.Model):
         DiagnosticsRequest,
         on_delete=models.CASCADE
     )
-
+    broken_device = models.CharField(max_length=128)
     def __str__(self) -> str :
         return self.description
     
