@@ -128,14 +128,23 @@ def create_diagnostic_request(request):
         )
     schedule_appointment.save()
 
+    type_house = data['type_house']
+    if type_house == True:
+        type_house = 'HOUSE'
+    else:
+        type_house = 'IN SERVICE'
+
+    user = get_user_model().objects.get(id=data['id_user'])
+    client = Client.objects.get(user=user)
+    
     diagnostics_request = DiagnosticsRequest(
-        type_house = data['type_house'],
+        type_house = type_house,
         date = start_time,
-        ready_for_repair = False,
-        user = get_user_model().objects.get(id=data['id_user']),
+        client = client,
         device = Device.objects.get(id=data['id_device']),
         schedule_appointment = schedule_appointment
         )
+
     diagnostics_request.save()
 
     return Response(response, status=status.HTTP_201_CREATED)
@@ -255,20 +264,27 @@ def get_devices_by_device(request, id):
 def create_diagnostic_report(request):
     data = json.loads(request.body)
 
-    price = Pricing (
-        price = 200,
-        discount_quota = 1
-    )
-
-    price.save()
+    state = data['state']
+    if state == True:
+        state = DiagnosticReport.State.SUCCESSFULLY
+    else:
+        state = DiagnosticReport.State.UNSUCCESSFULLY
     
-    diagnostic_report = DiagnosticReport(
+    diagnostic_report = DiagnosticReport (
         description = data['description'],
-        device = Device.objects.get(id=data['id_device']),
+        state=state,
         diagnostic_request = DiagnosticsRequest.objects.get(id=data['id_diagnostic']),
-        price = price
+        broken_device = data['broken_device']
     )
-
+    device = Device.objects.filter(name=data['broken_device']).exists()
+    print("eeeeeeeeeeee",device)
+    if (device == False):
+        device = Device (
+            name = data['broken_device'],
+            main_device = diagnostic_report.diagnostic_request.device,
+            category = diagnostic_report.diagnostic_request.device.category
+        )
+        device.save()
     diagnostic_report.save()
 
     return Response(status.HTTP_201_CREATED)

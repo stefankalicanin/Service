@@ -20,29 +20,33 @@ function UserDiagnosticRequest() {
     "id_user": null,
     "id_device": null 
   })
-
-  useEffect(() =>
-  {
-    axios.get('http://localhost:8000/api/user/all_categories')
-    .then(response => {
-      setCategory(response.data)
-      setCategorySize(response.data[0].size)
-      axios.get(`http://localhost:8000/api/user/all_device_by_category/${response.data[0].id}`)
-      .then(response=>{
-        setDevice(response.data)
-        setDiagnosticRequest({...diagnosticRequest, ["id_device"] : response.data[0].id})
-        
-      })
-      .catch(error=>{
-        console.log(error)
-      })
-    })
-    .catch(error => {
-      console.log(error)
-    })
-  }, [])
+const [submit, setSubmit] = useState(false)
+const [error, setError] = useState({
+  "category":true,
+  "device":true,
+  "date":true
+})
+useEffect(()=> {
+  axios.get('http://localhost:8000/api/user/all_categories')
+  .then(response => {
+    setCategory(response.data)
+  })
+  .catch(error=> {
+    console.log(error)
+  })
+}, [])
+ 
 
   const chooseCategory = (e) => {
+    const selectedCategory = e.target.value;
+    if (selectedCategory === 'empty') 
+    {
+      setError({...error, ["category"]:true})
+    }
+    else
+    {
+      setError({...error, ["category"]:false})
+    }
     const index = e.target.selectedIndex
     const el = e.target.childNodes[index]
     const id = el.getAttribute('id')
@@ -55,6 +59,7 @@ function UserDiagnosticRequest() {
     })
       axios.get(`http://localhost:8000/api/user/all_device_by_category/${id}`)
       .then(response => {
+        console.log(response.data)
         setDevice(response.data)
       })
       .then(error => {
@@ -63,6 +68,16 @@ function UserDiagnosticRequest() {
   }
 
   const chooseDevice = (e) => {
+    const selectedDevice = e.target.value;
+    if (selectedDevice === 'empty') 
+    {
+      setError({...error, ["device"]:true})
+    }
+    else
+    {
+      setError({...error, ["device"]:false})
+    }
+    
     const index = e.target.selectedIndex
     const el = e.target.childNodes[index]
     const id = el.getAttribute('id')
@@ -71,6 +86,8 @@ function UserDiagnosticRequest() {
 
   const handleFormInputChange = (name) => (event) => {
     const val = event.target.value;
+    if(!val) {setError({...error, ["date"]:true})} 
+    else {setError({...error, ["date"]:false})}
     setDiagnosticRequest({...diagnosticRequest, [name] : val})
   }
 
@@ -79,6 +96,12 @@ function UserDiagnosticRequest() {
   }
 
   const sendRequest = () => {
+    console.log(error)
+    setSubmit(true)
+   if(error.category === true || error.device === true || error.date === true)
+   {
+    return;
+   }
     axios.post('http://localhost:8000/api/user/diagnostic_request',
     {
       "date" : diagnosticRequest.date,
@@ -113,7 +136,7 @@ function UserDiagnosticRequest() {
      setResponse(res.data)
      setCheckResponse(false)
      alert('Successfully created diagnostic request')
-     window.location.assign('/user/diagnostic_request')
+     window.location.assign("/user/home")
     })
     .then(error => {
       console.log(error)
@@ -122,6 +145,7 @@ function UserDiagnosticRequest() {
 
   const refuseRequest = () => {
     setCheckResponse(false)
+    setRecommendedResponse(false)
   }
   return (
       <div>
@@ -137,7 +161,9 @@ function UserDiagnosticRequest() {
                         paddingTop:'10px'}}>
           <Form.Group className="mb-3" controlId="formBasicCategory">
             <Form.Label>Kategorija</Form.Label>
-            <select className="form-select" aria-label="Default select example" onChange={chooseCategory} required={true}>
+            <select className="form-select" aria-label="Default select example" onChange={chooseCategory} required={true} 
+            style={{border: submit && error.category ? '1px solid red':'none'}}>
+              <option value="empty" selected>Izaberi kategoriju</option>
               {category.map(c => 
               <option id = {c.id}>{c.name}</option>
               )}
@@ -145,7 +171,9 @@ function UserDiagnosticRequest() {
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicDevice">
             <Form.Label>Uredjaj</Form.Label>
-            <select className="form-select" aria-label="Default select example" onChange={chooseDevice} required={true}>
+            <select className="form-select" aria-label="Default select example" onChange={chooseDevice} required={true}
+            style={{border: submit && error.device ? '1px solid red':'none'}}>
+              <option value="empty">Izaberi uredjaj</option>
               {device.map(d => 
               <option id = {d.id}>{d.name}</option>
               )}
@@ -153,7 +181,8 @@ function UserDiagnosticRequest() {
           </Form.Group>
           <Form.Group className="mb-3" controlId="formBasicDate">
             <Form.Label>Datum</Form.Label>
-            <Form.Control type="datetime-local" name="date" value={diagnosticRequest.date} onChange={handleFormInputChange("date")} required={true}/>
+            <Form.Control type="datetime-local" name="date" value={diagnosticRequest.date} onChange={handleFormInputChange("date")} required={true} min={new Date().toISOString().slice(0, 16)}
+            style={{border: submit && error.date  ? '1px solid red':'none'}}/>
           </Form.Group>    
         </Form>
         {category_size === 'BIG' &&   
@@ -163,9 +192,9 @@ function UserDiagnosticRequest() {
         <Button variant="primary" onClick={sendRequest} style={{marginLeft:'30px'}}>Kreiraj</Button>
         {checkResponse  && 
         <div style={{marginLeft:'250px'}}>
-          {recommendedResponse && <p>The appointment is taken.Recommended appointment:</p>}
-          <p><strong>Start time:</strong> {validateResponse.start_time.slice(0,19)}</p>
-          <p><strong>End time:</strong> {validateResponse.end_time.slice(0,19)}</p>
+          {recommendedResponse && <p>Izabrani termin je zauzet.Preporučeni termin:</p>}
+          <p><strong>Početak:</strong> {validateResponse.start_time.slice(0,19)}</p>
+          <p><strong>Kraj:</strong> {validateResponse.end_time.slice(0,19)}</p>
           <Button variant="primary" onClick={confirmRequest}>Prihvati</Button>
           <Button variant="danger" onClick={refuseRequest} style={{marginLeft:'75px'}}>Odbij</Button>
         </div>} 
