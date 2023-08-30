@@ -200,12 +200,6 @@ def save_troubleshooting_request_repair(request):
     type = data['type']
     response, start_time, end_time = TroubleshootingService.create_troubleshooting_request_repair(date)
     
-    DiagnosticsRequest.objects.filter(id=data['id']).update(ready_for_repair=True)
-    diagnostic_request = DiagnosticsRequest.objects.get(id=data['id'])
-    diagnostic_report = DiagnosticReport.objects.get(diagnostic_request=diagnostic_request)
-    
-    device_quantity = diagnostic_report.device.quantity
-    Device.objects.filter(id=diagnostic_report.device.id).update(quantity=device_quantity-1)
     schedule_appointment = ScheduleAppointment(
         start_time = start_time,
         end_time = end_time,
@@ -214,16 +208,20 @@ def save_troubleshooting_request_repair(request):
         )
     schedule_appointment.save()
 
-    if type:
+    if type == 'zamena':
         type_troubleshooting = Troubleshooting.TypeOfTroubleshooting.REPLACE
     else:
         type_troubleshooting = Troubleshooting.TypeOfTroubleshooting.REPAIR
         
+    dr = DiagnosticReport.objects.get(id=data['id_diagnostic_report'])
+    dr.ready_for_repair = True
+    dr.save()
+
     troubleshooting = Troubleshooting(
         type = type_troubleshooting,
         date = start_time,
         schedule_appointment = schedule_appointment,
-        diagnostic_request = diagnostic_request
+        diagnostic_report = dr
     )
 
     troubleshooting.save()
@@ -274,13 +272,18 @@ def create_diagnostic_report(request):
         description = data['description'],
         state=state,
         diagnostic_request = DiagnosticsRequest.objects.get(id=data['id_diagnostic']),
-        broken_device = data['broken_device']
+        broken_device = data['broken_device'],
+        ready_for_repair = False
     )
     device = Device.objects.filter(name=data['broken_device']).exists()
-    print("eeeeeeeeeeee",device)
+   
     if (device == False):
         device = Device (
             name = data['broken_device'],
+            description = "",
+            price = 0,
+            under_warranty = False,
+            quantity = 0,
             main_device = diagnostic_report.diagnostic_request.device,
             category = diagnostic_report.diagnostic_request.device.category
         )
