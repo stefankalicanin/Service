@@ -71,7 +71,7 @@ class DiagnosticReportSerializers(serializers.ModelSerializer):
     
     class Meta:
         model = DiagnosticReport
-        fields = ['id', 'description', 'state', 'diagnostic_request', 'broken_device', 'ready_for_repair']
+        fields = ['id', 'description', 'state', 'diagnostic_request', 'broken_device', 'ready_for_repair', 'unsuccessfully_processing']
 
 
 class TroubleshootingSerializers(serializers.ModelSerializer):
