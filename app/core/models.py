@@ -145,6 +145,7 @@ class DiagnosticReport(models.Model):
         on_delete=models.CASCADE
     )
     broken_device = models.CharField(max_length=128)
+    ready_for_repair = models.BooleanField()
     def __str__(self) -> str :
         return self.description
     
@@ -162,10 +163,7 @@ class Troubleshooting(models.Model):
         ScheduleAppointment,
         on_delete=models.CASCADE
     )
-    diagnostic_request = models.OneToOneField(
-        DiagnosticsRequest,
-        on_delete=models.CASCADE
-    )
+
     diagnostic_report = models.OneToOneField(
         DiagnosticReport,
         on_delete=models.CASCADE
