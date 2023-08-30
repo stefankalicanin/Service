@@ -120,6 +120,13 @@ def create_diagnostic_request(request):
     date = parse_datetime(data['date'])
     response, start_time, end_time = ScheduleAppointmentService.get_diagnostic_schedule_appointment(date)
 
+    try:
+        id_diagnostic_report = data["id_diagnostic_report"]
+        diagnostic_report = DiagnosticReport.objects.get(id=id_diagnostic_report)
+        diagnostic_report.unsuccessfully_processing = True
+        diagnostic_report.save()
+    except Exception as e:
+        None
     schedule_appointment = ScheduleAppointment(
         start_time = start_time,
         end_time = end_time,
@@ -297,13 +304,12 @@ def get_number_of_devices(request, id):
     return Response(DeviceService.get_number_of_devices(id), status.HTTP_200_OK)
 
 @api_view(['GET'])
-def get_order_by_device(request, id):
-    number_device = DeviceService.get_number_of_devices(id)
-    if number_device == 0:
-            order = OrderService.get_order_by_device(id)
-            return Response(order, status.HTTP_200_OK)
+def get_order_by_device(request, name):
+    device = Device.objects.get(name=name)
+    if device.quantity == 0:
+        return Response(OrderService.get_order_by_device(name), status=status.HTTP_302_FOUND)
     else:
-        return Response(None, status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
     
 @api_view(['GET'])
 def generate_PDF(request, id):

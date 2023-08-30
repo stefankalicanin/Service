@@ -150,7 +150,7 @@ useEffect(()=> {
   return (
       <div>
        <div style={{width : '100%',
-                height:'600px',
+                height:'650px',
                 backgroundColor:'#E4E9E1',
                 borderRadius:'25px',
                 border : '1px solid black'

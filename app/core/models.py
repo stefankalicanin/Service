@@ -146,6 +146,8 @@ class DiagnosticReport(models.Model):
     )
     broken_device = models.CharField(max_length=128)
     ready_for_repair = models.BooleanField()
+    unsuccessfully_processing = models.BooleanField(default=False)
+    
     def __str__(self) -> str :
         return self.description
     

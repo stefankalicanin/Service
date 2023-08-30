@@ -28,8 +28,11 @@ function DiagnosticRequestsDone() {
     "type_house" :null,
     "date" : null,
     "id_user": null,
-    "id_device": null 
+    "id_device": null,
+    "id_diagnostic_report":null
   })
+  const [order, setOrder] = useState()
+  const [checkOrder, setCheckOrder] = useState(false)
   useEffect (() => {
     axios.get(`http://localhost:8000/api/user/diagnostic_requests_done/${decoded_token.user_id}`)
     .then(response => {
@@ -58,8 +61,25 @@ function DiagnosticRequestsDone() {
     setShowModalReport(!showModalReport)
     const matchingDiagnosticRequest = diagnosticRequests.filter(dr => dr.id === id)
     const desc = matchingDiagnosticRequest.map(dr => dr.description)
-    const under_warranty = matchingDiagnosticRequest.map(dr => dr.diagnostic_request.device.under_warranty)
-    const type = under_warranty ? "popravka":"zamena"
+    const under_warranty = matchingDiagnosticRequest.map(dr => dr.diagnostic_request.device.under_warranty)[0]
+  
+    const type = under_warranty ? "zamena":"popravka"
+    const device = matchingDiagnosticRequest.map(dr => dr.broken_device)[0];
+    const encodedDevice = encodeURIComponent(device);
+
+if (under_warranty === true) {
+  axios.get(`http://localhost:8000/api/user/order/device/${encodedDevice}`)
+    .then(response => {
+      //setOrder(response.data)
+      console.log(response.data)
+    })
+    .catch(error => {
+      if(error.response.status === 302) {
+        setOrder(error.response.data.date)
+        setCheckOrder(true)
+      }
+    });
+}
 
     setDescription(desc)
     setTroubleshootingRequest({...troubleshootingRequest, ["type"]: type, ["id_diagnostic_report"]:id})
@@ -110,9 +130,12 @@ const handleTypeHouse = (type) => {
   const initModalRequest = (id) => {
     setShowModalRequest(!showModalRequest)
     const matchingDiagnosticRequest = diagnosticRequests.filter(dr => dr.id === id)
-    const id_device = matchingDiagnosticRequest.map(dr => dr.diagnostic_request.device.id)
-    const type_house = matchingDiagnosticRequest.map(dr => dr.diagnostic_request.type_house)
-    setNewDiagnosticRequest({...newDiagnosticRequest, ["id_device"]:id_device, ["type_house"]:handleTypeHouse(type_house)})
+    const id_device = parseInt(matchingDiagnosticRequest.map(dr => dr.diagnostic_request.device.id))
+    console.log(id_device)
+    const type_house = matchingDiagnosticRequest.map(dr => dr.diagnostic_request.type_house)[0]
+    console.log(type_house)
+    setNewDiagnosticRequest({...newDiagnosticRequest, id_device:id_device, type_house:handleTypeHouse(type_house), "id_diagnostic_report":id})
+    console.log(newDiagnosticRequest)
   }
   const handleFormInputChangeNewRequest = (name) => (event) => {
     const val = event.target.value;
@@ -142,12 +165,14 @@ const createNewDiagnosticRequest = () => {
 }
 
 const saveNewDiagnosticRequest = () => {
+  console.log(newDiagnosticRequest)
   axios.post('http://localhost:8000/api/user/diagnostic_request/save',
   {
     "type_house" : newDiagnosticRequest.type_house,
     "date" : newDiagnosticRequest.date,
     "id_user": decoded_token.user_id,
-    "id_device": parseInt(newDiagnosticRequest.id_device)
+    "id_device": newDiagnosticRequest.id_device,
+    "id_diagnostic_report": newDiagnosticRequest.id_diagnostic_report
   })
   .then(res => {
    console.log(res.data)
@@ -159,6 +184,17 @@ const saveNewDiagnosticRequest = () => {
     console.log(error)
   })
 }
+
+const refuseRequest = () => {
+  setCheckResponse(false)
+  setRecommendedResponse(false)
+}
+
+const refuseRequestDiagnostic = () => {
+  setCheckResponse1(false)
+  setRecommendedResponse1(false)
+}
+
   return (
     <div>
       <div style={{width:'70%', margin:'auto', marginTop:'100px' }}>
@@ -215,7 +251,7 @@ const saveNewDiagnosticRequest = () => {
           <p><strong>Početak:</strong> {validateResponse1.start_time.slice(0,19)}</p>
           <p><strong>Kraj:</strong>{validateResponse1.end_time.slice(0,19)}</p>
           <Button variant="primary" onClick={saveNewDiagnosticRequest}>Prihvati</Button>
-          <Button variant="danger" style={{marginLeft:'70px'}}>Odbij</Button></div>
+          <Button variant="danger" onClick={refuseRequestDiagnostic} style={{marginLeft:'70px'}}>Odbij</Button></div>
       }      </Modal.Body>
       <Modal.Footer>
           <Button variant="danger" onClick={()=> setShowModalRequest(!showModalRequest)}>
@@ -231,10 +267,11 @@ const saveNewDiagnosticRequest = () => {
           <h3>Opis kvara:</h3>
           <strong><p>{description}</p></strong>
           <p>Preporuka servisera: <strong>{troubleshootingRequest.type}.</strong></p>
-          <p>Dijagnostika je <strong>uspešno</strong> obavljena. Molimo unesite željeni datum za popravku uredjaja.</p>
+          <p>Dijagnostika je <strong>uspešno</strong> obavljena.</p>
+          {checkOrder && <p>Uredjaj trenutno nije na stanju. Uredjaj stiže:{order.slice(0, 19).replace('T', ' ')} .</p>}
           <Form.Group className="mb-3" controlId="formBasicDate">
             <Form.Label>Datum</Form.Label>
-            <Form.Control type="datetime-local" name="date" value={troubleshootingRequest.date} onChange={handleFormInputChange("date")} min={new Date().toISOString().slice(0, 16)}/>
+            <Form.Control type="datetime-local" name="date"  value={troubleshootingRequest.date} onChange={handleFormInputChange("date")} />
           </Form.Group>  
          <Button onClick={createTroubleshootingRequest}>Potvrdi</Button> 
          {checkResponse  && 
@@ -243,7 +280,7 @@ const saveNewDiagnosticRequest = () => {
           <p><strong>Početak:</strong> {validateResponse.start_time.slice(0,19)}</p>
           <p><strong>Kraj:</strong>{validateResponse.end_time.slice(0,19)}</p>
           <Button variant="primary" onClick={confirmTroubleshootingRequest}>Prihvati</Button>
-          <Button variant="danger" style={{marginLeft:'70px'}}>Odbij</Button>
+          <Button variant="danger" onClick={refuseRequest} style={{marginLeft:'70px'}}>Odbij</Button>
         </div>}  
         </Modal.Body>
         <Modal.Footer>

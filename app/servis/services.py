@@ -225,8 +225,7 @@ class DiagnosticReportService:
         user = get_user_model().objects.get(id=id)
         client = Client.objects.get(user=user)
         diagnostic_request = DiagnosticsRequest.objects.all().filter(Q(client=client,schedule_appointment__is_done=True))
-        diagnostic_report = DiagnosticReport.objects.all().filter(Q(diagnostic_request__in=diagnostic_request, ready_for_repair=False))
-
+        diagnostic_report = DiagnosticReport.objects.all().filter(Q(diagnostic_request__in=diagnostic_request, ready_for_repair=False, unsuccessfully_processing=False))
         serializersDiagnosticReport = DiagnosticReportSerializers(diagnostic_report, many=True)
         return serializersDiagnosticReport.data
     
@@ -234,8 +233,8 @@ class DiagnosticReportService:
 class OrderService:
 
     @staticmethod
-    def get_order_by_device(id):
-        device = Device.objects.get(id=id)
+    def get_order_by_device(name):
+        device = Device.objects.get(name=name)
         order = Order.objects.get(device=device)
 
         orderSerializers = OrderSerializers(order)
