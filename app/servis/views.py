@@ -11,8 +11,8 @@ from django.db.models import Q
 import json
 import os
 
-from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing
-from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService, UserService
+from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing, TravelWarrant
+from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService, UserService, TravelWarrantService
 
 @api_view(['GET'])
 def HelloWorld(request):
@@ -149,7 +149,8 @@ def create_diagnostic_request(request):
         date = start_time,
         client = client,
         device = Device.objects.get(id=data['id_device']),
-        schedule_appointment = schedule_appointment
+        schedule_appointment = schedule_appointment,
+        state = DiagnosticsRequest.DiagnosticState.UNPROCESSED
         )
 
     diagnostics_request.save()
@@ -441,3 +442,44 @@ def change_password_user(request):
 @api_view(['GET'])
 def repairer_profiles(request):
     return Response(RepairerService.get_all_repairers(), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_travel_warrant(request):
+    data = json.loads(request.body)
+
+    id = data['id']
+
+    schedule_appointment = ScheduleAppointment.objects.get(id=id)
+    
+    diagnostic_request = DiagnosticsRequest.objects.get(schedule_appointment=schedule_appointment)
+    diagnostic_request.state = DiagnosticsRequest.DiagnosticState.PROCESSING
+    diagnostic_request.save()
+
+    travel_warrant = TravelWarrant (
+        schedule_appointment = schedule_appointment,
+        state = TravelWarrant.TravelWarrantState.UNAPPROVED
+    )
+
+    travel_warrant.save()
+
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def get_travel_warrant_unapproved(request):
+    return Response(TravelWarrantService.get_all_unapproved_travel_warrant(), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_diagnostic_request_by_schedule_appointment(request, id):
+    return Response(DiagnosticsRequestService.get_diagnostic_request_by_schedule_appointment(id), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def update_travel_warrant(request):
+    data = json.loads(request.body)
+    id = data['id']
+    approved = data['approved']
+
+    if approved:
+        return Response(TravelWarrantService.update(id), status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    

@@ -100,6 +100,21 @@ const handleTypeDiagnostic = (type) => {
 const handleCheckBoxChange = () => {
   setCheck(!check)
 }
+
+const createTravelWarrant = (id) => {
+  axios.post('http://localhost:8000/api/repairer/travel_warrant_request',
+  {
+    "id":id
+  }
+  )
+  .then(response => {
+    console.log(response)
+    window.location.reload()
+  })
+  .catch(error => {
+    console.log(error)
+  })
+}
   return (
     <div>
       {!checkTableEmpty &&
@@ -128,8 +143,9 @@ const handleCheckBoxChange = () => {
       <th>{dsa.device.name}</th>
       <th>{dsa.device.category.name}</th>
       <th>{handleTypeDiagnostic(dsa.type_house)}</th>
-      <th>{dsa.type_house === 'IN SERVICE' ?<Button variant="success" onClick={() => initModal(dsa)}>Napiši izveštaj</Button>
-      :<Button className="btn-danger">Putni nalog</Button>}</th>
+      <th>{dsa.type_house === 'IN SERVICE' || dsa.state === 'PROCESSED' ?<Button variant="success" onClick={() => initModal(dsa)}>Napiši izveštaj</Button>
+      :<Button className="btn-danger" disabled = {dsa.state === 'PROCESSING' ? true:false} onClick={()=>createTravelWarrant(dsa.schedule_appointment.id)}>
+        {dsa.state === 'PROCESSING' ? 'Odobravanje putnog naloga' : 'Putni nalog'}</Button>}</th>
     </tr>
    ))}
   </tbody>
