@@ -52,6 +52,9 @@ const NavBar = () => {
         {role === 'ADMIN' && <Nav.Link href="/admin/users/profiles">
           Prikaz profila korisnika
         </Nav.Link>}
+        {role === 'ADMIN' && <Nav.Link href="/admin/travelwarrant">
+          Putni nalozi
+          </Nav.Link>}
       {!TokenService.getToken() && <Nav.Link href="/user/register">
           Registracija
       </Nav.Link> }

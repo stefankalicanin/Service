@@ -113,9 +113,16 @@ class DiagnosticsRequest(models.Model):
     class DiagnosticType(models.TextChoices):
         HOUSE = "HOUSE"
         IN_SERVICE = "IN SERVICE"
+    
+
+    class DiagnosticState(models.TextChoices):
+        PROCESSED = "PROCESSED"
+        PROCESSING = "PROCESSING"
+        UNPROCESSED = "UNPROCESSED"
 
     type_house = models.CharField(max_length=10, choices=DiagnosticType.choices)
     date = models.DateTimeField()
+    state = models.CharField(max_length=11, choices=DiagnosticState.choices)
     client = models.ForeignKey(
         Client,
         on_delete=models.CASCADE
@@ -195,7 +202,13 @@ class Order(models.Model):
 
 
 class TravelWarrant(models.Model):
-    data = models.CharField(max_length=1024)
+
+    class TravelWarrantState(models.TextChoices):
+        APPROVED = "APPROVED"
+        UNAPPROVED = "UNAPPROVED"
+
+
+    state = models.CharField(max_length=10, choices=TravelWarrantState.choices)
     schedule_appointment = models.OneToOneField(
         ScheduleAppointment,
         on_delete = models.CASCADE

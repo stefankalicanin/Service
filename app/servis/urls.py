@@ -34,6 +34,10 @@ urlpatterns = [
     path('admin/create/device', views.create_device, name="Create device"),
     path('admin/users/profiles', views.get_all_users_profile, name="All users profiles"),
     path('user/password/change', views.change_password_user, name="Change user password"),
-    path('user/repairer/profiles', views.repairer_profiles, name="Repairer profiles")
+    path('user/repairer/profiles', views.repairer_profiles, name="Repairer profiles"),
+    path('repairer/travel_warrant_request', views.create_travel_warrant, name="Request for travel warrant"),
+    path('admin/travel_warrant_unapproved', views.get_travel_warrant_unapproved, name="Get all unapproved travel warrant"),
+    path('admin/diagnostic_request/<int:id>', views.get_diagnostic_request_by_schedule_appointment, name="Get details about travel warrant"),
+    path('admin/travel_warrant/update', views.update_travel_warrant, name="Update travel warrant to approved")
 
 ]
