@@ -36,8 +36,11 @@ urlpatterns = [
     path('user/password/change', views.change_password_user, name="Change user password"),
     path('user/repairer/profiles', views.repairer_profiles, name="Repairer profiles"),
     path('repairer/travel_warrant_request', views.create_travel_warrant, name="Request for travel warrant"),
-    path('admin/travel_warrant_unapproved', views.get_travel_warrant_unapproved, name="Get all unapproved travel warrant"),
+    path('admin/travel_warrant_unapproved', views.get_travel_warrant_on_wait, name="Get all unapproved travel warrant"),
     path('admin/diagnostic_request/<int:id>', views.get_diagnostic_request_by_schedule_appointment, name="Get details about travel warrant"),
-    path('admin/travel_warrant/update', views.update_travel_warrant, name="Update travel warrant to approved")
+    path('admin/travel_warrant/approved', views.approved_travel_warrant, name="Update travel warrant to approved"),
+    path('admin/travel_warrant/unapproved', views.unapproved_travel_warrant, name="Update travel warrant to unapproved"),
+    path('repairer/travel_warrant/schedule_appointment/<int:id>', views.get_travelwarrant_by_scheduleappointment_id, name="Travel warrant by schedule appointment")
+
 
 ]

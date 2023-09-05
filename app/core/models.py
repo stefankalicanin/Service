@@ -118,6 +118,7 @@ class DiagnosticsRequest(models.Model):
     class DiagnosticState(models.TextChoices):
         PROCESSED = "PROCESSED"
         PROCESSING = "PROCESSING"
+        INITIAL = "INITIAL"
         UNPROCESSED = "UNPROCESSED"
 
     type_house = models.CharField(max_length=10, choices=DiagnosticType.choices)
@@ -206,6 +207,7 @@ class TravelWarrant(models.Model):
     class TravelWarrantState(models.TextChoices):
         APPROVED = "APPROVED"
         UNAPPROVED = "UNAPPROVED"
+        ON_WAIT = "ON_WAIT"
 
 
     state = models.CharField(max_length=10, choices=TravelWarrantState.choices)

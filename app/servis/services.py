@@ -254,17 +254,36 @@ class OrderService:
 class TravelWarrantService:
 
     @staticmethod
-    def get_all_unapproved_travel_warrant():
-        travel_warrant = TravelWarrant.objects.filter(state=TravelWarrant.TravelWarrantState.UNAPPROVED)
+    def get_all_on_wait_travel_warrant():
+        travel_warrant = TravelWarrant.objects.filter(state=TravelWarrant.TravelWarrantState.ON_WAIT)
 
         travelWarrantSerializers = TravelWarrantSerializers(travel_warrant, many=True)
         return travelWarrantSerializers.data
     
     @staticmethod
-    def update(id):
+    def approved(id):
         travel_warrant = TravelWarrant.objects.filter(id=id).update(state=TravelWarrant.TravelWarrantState.APPROVED)
         travel_warrant = TravelWarrant.objects.get(id=id)
         schedule_appointment = travel_warrant.schedule_appointment
         diagnostic_request = DiagnosticsRequest.objects.get(schedule_appointment=schedule_appointment)
         DiagnosticsRequest.objects.filter(id = diagnostic_request.id).update(state=DiagnosticsRequest.DiagnosticState.PROCESSED)
         return travel_warrant
+    
+    @staticmethod
+    def unapproved(id):
+        travel_warrant = TravelWarrant.objects.filter(id=id).update(state=TravelWarrant.TravelWarrantState.UNAPPROVED)
+        travel_warrant = TravelWarrant.objects.get(id=id)
+        schedule_appointment = travel_warrant.schedule_appointment
+        diagnostic_request = DiagnosticsRequest.objects.get(schedule_appointment=schedule_appointment)
+        DiagnosticsRequest.objects.filter(id = diagnostic_request.id).update(state=DiagnosticsRequest.DiagnosticState.UNPROCESSED)
+        return travel_warrant
+    
+    @staticmethod
+    def get_travelwarrant_by_scheduleappointment_id(id):
+        schedule_appointment = ScheduleAppointment.objects.get(id=id)
+        travel_warrant = TravelWarrant.objects.get(schedule_appointment=schedule_appointment)
+
+        travelWarrantSerializers = TravelWarrantSerializers(travel_warrant)
+        return travelWarrantSerializers.data
+    
+    
