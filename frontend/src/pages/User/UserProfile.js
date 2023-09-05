@@ -33,7 +33,8 @@ function UserProfile() {
       current_password : '',
       new_password:''
     })
-    const [error, setError] = useState(false)
+    const [errorCurrentPassword, setErrorCurrentPassword] = useState(false)
+
     useEffect(() => {
       axios.get(`http://localhost:8000/api/user/profile/${decoded_token.user_id}`)
       .then(response  => {
@@ -76,10 +77,10 @@ function UserProfile() {
 
     const changePassword = () => {
       setShowPasswordModal(true);
-      setError(false)
     }
 
     const handleChangePassword = () => {
+      if(changePasswordData.current_password === '' || changePasswordData.new_password === '') {return;}
       axios.post('http://localhost:8000/api/user/password/change', changePasswordData)
       .then(response=> {
         console.log(response.data)
@@ -88,12 +89,12 @@ function UserProfile() {
       }
       )
       .catch(error=>{
-        if(error.response.status === 404) {
-          setError(true)
+        if(error.response.status === 400) {
+          setErrorCurrentPassword(true)
         }
         else 
         {
-          setError(false)
+          setErrorCurrentPassword(false)
         }
       })
     }
@@ -174,16 +175,25 @@ function UserProfile() {
                 <Form.Group className="mb-3" controlId="formBasicCurrentPassword">
                     <Form.Label>Trenutna lozinka</Form.Label>
                     <Form.Control type={showPassword ? 'text':'password'} placeholder="Unesite trenutnu lozinku" name="current_password" value={changePassword.currentPassword} onChange={handlePasswordData("current_password")} />
+                    {changePasswordData.current_password === "" && (
+        <Form.Text className="text-danger">
+            Molimo unesite trenutnu lozinku!
+        </Form.Text>)}
                 </Form.Group>
       </Form>
       <Form>
                 <Form.Group className="mb-3" controlId="formBasicNewPassword">
                     <Form.Label>Nova lozinka</Form.Label>
                     <Form.Control type={showPassword ? 'text':'password'} placeholder="Unesite novu lozinku" name="new_password" value={changePassword.newPassword} onChange={handlePasswordData("new_password")} />
+                    {changePasswordData.new_password === "" && (
+        <Form.Text className="text-danger">
+            Molimo unesite novu lozinku!
+        </Form.Text>)}
                 </Form.Group>
       
       </Form>
-      {error && <p>Pogrešno uneta trenutna lozinka!</p>}
+      {errorCurrentPassword && <p>Pogrešno uneta trenutna lozinka!</p>}
+      
       <Button onClick={handleChangePassword}>Potvrdi</Button>
       <Button variant='danger' onClick={togglePassword} style={{marginLeft:'260px'}}>{buttonText}</Button>
       </Modal.Body>

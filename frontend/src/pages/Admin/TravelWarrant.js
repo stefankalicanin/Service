@@ -9,7 +9,6 @@ function TravelWarrant() {
   const [travelWarrant, setTravelWarrant] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [diagnosticRequest, setDiagnosticRequest] = useState({})
-  const [check, setCheck] = useState(false)
   const [travelWarrantId, setTravelWarrantId] = useState()
 
   useEffect(()=> {
@@ -36,14 +35,10 @@ function TravelWarrant() {
     })
   }
 
-  const handleCheckBoxChange = () => {
-    setCheck(!check)
-  }
 
   const confirmTravelWarrant = (id) => {
-    axios.post('http://localhost:8000/api/admin/travel_warrant/update', {
-      "id":id,
-      "approved":check
+    axios.post('http://localhost:8000/api/admin/travel_warrant/approved', {
+      "id":id
     })
     .then(response => {
       console.log(response.data)
@@ -53,6 +48,17 @@ function TravelWarrant() {
     })
   }
 
+  const refuseTravelWarrant = (id) => {
+    axios.post('http://localhost:8000/api/admin/travel_warrant/unapproved', {
+      "id":id
+    })
+    .then(response => {
+      console.log(response.data)
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
   return (
     <div>
       <div style ={{width:'70%', margin:'auto', marginTop:'90px'}}>
@@ -80,21 +86,17 @@ function TravelWarrant() {
         <Modal.Title>Detalji o putnom nalogu</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-
-        
       <h3>Podaci o serviseru koji traži putni nalog</h3>
       <p>Ime: {diagnosticRequest.schedule_appointment?.repairer_profile?.user?.first_name || 'N/A'}</p>
       <p>Prezime: {diagnosticRequest.schedule_appointment?.repairer_profile?.user?.last_name || 'N/A'}</p>
       <h3>Podaci o uređaju za dijagnostiku</h3>
       <p>Naziv: {diagnosticRequest.device?.name || 'N/A'}</p>
       <p>Kategorija: {diagnosticRequest.device?.category?.name || 'N/A'}</p>
-        
-        <Form>
-                <Form.Group className="mb-3"  controlId="formBasicCheckbox" checked={check} onChange={handleCheckBoxChange}>
-                  <Form.Check type="checkbox"  label="Odobren putni nalog" />
-                </Form.Group>
-        </Form>
-        <Button className='btn-primary' onClick={()=>confirmTravelWarrant(travelWarrantId)}>Potvrdi</Button>
+      <h3>Da li želite da izdate putni nalog?</h3>
+      <div style={{marginTop:'30px'}}>
+        <Button className='btn-primary' style={{marginLeft:'50px', width:'100px'}} onClick={()=>confirmTravelWarrant(travelWarrantId)}>Da</Button>
+        <Button className='btn-danger' style={{marginLeft:'120px', width:'100px'}} onClick={()=>refuseTravelWarrant(travelWarrantId)}>Ne</Button>
+        </div>
       </Modal.Body>
       <Modal.Footer>
           <Button variant="danger" onClick={()=> setShowModal(!showModal)}>

@@ -33,6 +33,8 @@ function DiagnosticRequestsDone() {
   })
   const [order, setOrder] = useState()
   const [checkOrder, setCheckOrder] = useState(false)
+  const [submit, setSubmit] = useState(false)
+  
   useEffect (() => {
     axios.get(`http://localhost:8000/api/user/diagnostic_requests_done/${decoded_token.user_id}`)
     .then(response => {
@@ -138,10 +140,19 @@ const handleTypeHouse = (type) => {
     console.log(newDiagnosticRequest)
   }
   const handleFormInputChangeNewRequest = (name) => (event) => {
+    
     const val = event.target.value;
+   
     setNewDiagnosticRequest({...newDiagnosticRequest, [name]:val})
   }
 const createNewDiagnosticRequest = () => {
+ 
+  setSubmit(true)
+  if(newDiagnosticRequest.date === null) {
+    
+    return;
+  }
+  
   axios.post('http://localhost:8000/api/user/diagnostic_request',
   {
     "date":newDiagnosticRequest.date
@@ -242,7 +253,8 @@ const refuseRequestDiagnostic = () => {
       <Modal.Body>
       <Form.Group className="mb-3" controlId="formBasicDate">
             <Form.Label>Datum</Form.Label>
-            <Form.Control type="datetime-local" name="date" value={newDiagnosticRequest.date} onChange={handleFormInputChangeNewRequest("date")}/>
+            <Form.Control type="datetime-local" name="date" value={newDiagnosticRequest.date} onChange={handleFormInputChangeNewRequest("date")}
+            style={{border: submit && newDiagnosticRequest.date === null ? '1px solid red':'none'}}/>
           </Form.Group>   
       <Button onClick={createNewDiagnosticRequest}>Potvrdi</Button>
       {checkResponse1  && 

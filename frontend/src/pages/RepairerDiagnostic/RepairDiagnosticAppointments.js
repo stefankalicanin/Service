@@ -11,11 +11,16 @@ function RepairDiagnosticAppointments() {
  const [diagnosticScheduleAppointments, setDiagnosticScheduleAppointments] = useState([])
  const [checkTableEmpty, setCheckTableEmpty] = useState(false)
  const [showModal, setShowModal] = useState(false)
- const [diagnosticReport, setDiagnosticReport] = useState({})
+ const [diagnosticReport, setDiagnosticReport] = useState({
+  description:'', 
+  id:null,
+  broken_device:''
+ })
  const [device, setDevice] = useState([])
  const[other, setOther] = useState(false)
  const[check, setCheck] = useState(false)
- 
+ const [submit, setSubmit] = useState(false)
+ const [errorDevice, setErrorDevice] = useState(false)
  useEffect(() => {
   axios.get(`http://localhost:8000/api/repairer/profile/${decoded_token.user_id}`)
   .then(response => {
@@ -38,9 +43,11 @@ function RepairDiagnosticAppointments() {
  
  
  const diagnosticScheduleAppointmentDone = (id) => {
+  setSubmit(true)
+  if(diagnosticReport.description === "" || diagnosticReport.broken_device === "" || errorDevice === true) {return;}
   axios.post(`http://localhost:8000/api/repairer/update_diagnostic_schedule_appointment_done/${id}`)
   .then(response => {
-   
+   console.log(response.data)
   })
   .then(error => {
     console.log(error)
@@ -77,6 +84,14 @@ const handleFormInputChange = (name) => (event) => {
 const chooseDevice = (e) => {
   
   const selectedDevice = e.target.value;
+  if (selectedDevice === 'empty')
+  {
+    setErrorDevice(true)
+  }
+  else
+  {
+    setErrorDevice(false)
+  }
   if (selectedDevice === 'other')
   {
     setOther(true)
@@ -115,6 +130,18 @@ const createTravelWarrant = (id) => {
     console.log(error)
   })
 }
+
+const handleUnapprovedTravelWarrant = (id) => {
+  axios.post(`http://localhost:8000/api/repairer/update_diagnostic_schedule_appointment_done/${id}`)
+  .then(response => {
+   console.log(response.data)
+   window.location.reload()
+  })
+  .then(error => {
+    console.log(error)
+  })
+}
+
   return (
     <div>
       {!checkTableEmpty &&
@@ -143,9 +170,10 @@ const createTravelWarrant = (id) => {
       <th>{dsa.device.name}</th>
       <th>{dsa.device.category.name}</th>
       <th>{handleTypeDiagnostic(dsa.type_house)}</th>
-      <th>{dsa.type_house === 'IN SERVICE' || dsa.state === 'PROCESSED' ?<Button variant="success" onClick={() => initModal(dsa)}>Napiši izveštaj</Button>
-      :<Button className="btn-danger" disabled = {dsa.state === 'PROCESSING' ? true:false} onClick={()=>createTravelWarrant(dsa.schedule_appointment.id)}>
-        {dsa.state === 'PROCESSING' ? 'Odobravanje putnog naloga' : 'Putni nalog'}</Button>}</th>
+      <th>{(dsa.type_house === 'IN SERVICE' && dsa.state === 'INITIAL') || (dsa.type_house === 'IN SERVICE' && dsa.state === 'PROCESSED') || (dsa.type_house === 'HOUSE' && dsa.state === 'PROCESSED') ? <Button onClick={()=>initModal(dsa)}>Napiši izveštaj</Button>
+      :(dsa.type_house === 'HOUSE' && dsa.state === 'INITIAL') ? <Button className="btn-danger" onClick={() => createTravelWarrant(dsa.schedule_appointment.id)}>Putni nalog</Button>
+      :(dsa.type_house === 'HOUSE' && dsa.state === 'PROCESSING') ? <Button className="btn-danger" disabled={true}>Odobravanje putnog naloga</Button>
+      :(dsa.type_house === 'HOUSE' && dsa.state === 'UNPROCESSED') ? <div><p>Putni nalog nije odobren</p><Button className="btn-danger" onClick={()=>handleUnapprovedTravelWarrant(dsa.id)}>OK</Button></div>:null}</th>
     </tr>
    ))}
   </tbody>
@@ -162,11 +190,16 @@ const createTravelWarrant = (id) => {
                     <Form.Label>Opis</Form.Label>
                     <Form.Control type="text" placeholder="Unesite opis dijagnostike..." name="description" value={diagnosticReport.description} onChange={handleFormInputChange("description")}
                     />
+                    {diagnosticReport.description === "" && (
+                      <Form.Text className='text-danger'>
+                        Molimo unesite opis kvara!
+                      </Form.Text>
+                    )}
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicType">
                 <Form.Label>Pokvareni uredjaj</Form.Label>
                 <select className="form-select" aria-label="Default select example" onChange={chooseDevice} required={true}
-                >
+                style={{border: submit && errorDevice ? '1px solid red':'none'}}>
                   <option value="empty">Selektuj</option>
               {device.map(c => 
               <option value={c.name}>{c.name}</option>
@@ -178,6 +211,11 @@ const createTravelWarrant = (id) => {
                     <Form.Label>Naziv uredjaja</Form.Label>
                     <Form.Control type="text" placeholder="Unesite naziv uredjaja..." name="description" value={diagnosticReport.broken_device} onChange={handleFormInputChange("broken_device")}
                     />
+                    {diagnosticReport.broken_device === "" && (
+                      <Form.Text className='text-danger'>
+                        Molimo unesite pokvareni uredjaj!
+                      </Form.Text>
+                    )}
                     <Form.Text>Dodajte novi pokvareni uredjaj.</Form.Text>
                 </Form.Group>}
                 <Form.Group className="mb-3"  controlId="formBasicCheckbox" checked={check} onChange={handleCheckBoxChange}>

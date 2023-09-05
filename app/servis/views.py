@@ -150,7 +150,7 @@ def create_diagnostic_request(request):
         client = client,
         device = Device.objects.get(id=data['id_device']),
         schedule_appointment = schedule_appointment,
-        state = DiagnosticsRequest.DiagnosticState.UNPROCESSED
+        state = DiagnosticsRequest.DiagnosticState.INITIAL
         )
 
     diagnostics_request.save()
@@ -431,11 +431,15 @@ def get_all_users_profile(request):
 def change_password_user(request):
     data = json.loads(request.body)
     User = get_user_model()
-    user = User.objects.get(username=data['username'])
-    if user.check_password(data['current_password']):
-        user.set_password(data['new_password'])
-        user.save()
-        return Response({}, status=status.HTTP_200_OK)
+    user_exists = User.objects.filter(username=data['username']).exists()
+    if user_exists:
+        user = User.objects.get(username=data['username'])
+        if user.check_password(data['current_password']):
+            user.set_password(data['new_password'])
+            user.save()
+            return Response({}, status=status.HTTP_200_OK)
+        else:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
     
@@ -457,7 +461,7 @@ def create_travel_warrant(request):
 
     travel_warrant = TravelWarrant (
         schedule_appointment = schedule_appointment,
-        state = TravelWarrant.TravelWarrantState.UNAPPROVED
+        state = TravelWarrant.TravelWarrantState.ON_WAIT
     )
 
     travel_warrant.save()
@@ -465,21 +469,29 @@ def create_travel_warrant(request):
     return Response(status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
-def get_travel_warrant_unapproved(request):
-    return Response(TravelWarrantService.get_all_unapproved_travel_warrant(), status=status.HTTP_200_OK)
+def get_travel_warrant_on_wait(request):
+    return Response(TravelWarrantService.get_all_on_wait_travel_warrant(), status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_diagnostic_request_by_schedule_appointment(request, id):
     return Response(DiagnosticsRequestService.get_diagnostic_request_by_schedule_appointment(id), status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def update_travel_warrant(request):
+def approved_travel_warrant(request):
     data = json.loads(request.body)
     id = data['id']
-    approved = data['approved']
+    
+    return Response(TravelWarrantService.approved(id), status=status.HTTP_200_OK)
+    
+@api_view(['POST'])
+def unapproved_travel_warrant(request):
+    data = json.loads(request.body)
+    id = data['id']
 
-    if approved:
-        return Response(TravelWarrantService.update(id), status=status.HTTP_200_OK)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response(TravelWarrantService.unapproved(id), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_travelwarrant_by_scheduleappointment_id(request, id):
+    return Response(TravelWarrantService.get_travelwarrant_by_scheduleappointment_id(id), status=status.HTTP_200_OK)
+   
     
