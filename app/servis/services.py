@@ -252,10 +252,13 @@ class OrderService:
     @staticmethod
     def get_order_by_device(name):
         device = Device.objects.get(name=name)
-        order = Order.objects.get(device=device)
-
-        orderSerializers = OrderSerializers(order)
-        return orderSerializers.data
+        order_exists = Order.objects.filter(device=device).exists()
+        if order_exists:
+            order = Order.objects.get(device=device)
+            orderSerializers = OrderSerializers(order)
+            return orderSerializers.data
+        else:
+            return None
     
 
 class TravelWarrantService:
