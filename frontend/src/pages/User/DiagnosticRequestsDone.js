@@ -34,7 +34,7 @@ function DiagnosticRequestsDone() {
   const [order, setOrder] = useState()
   const [checkOrder, setCheckOrder] = useState(false)
   const [submit, setSubmit] = useState(false)
-  
+  const [notOrder, setNotOrder] = useState()
   useEffect (() => {
     axios.get(`http://localhost:8000/api/user/diagnostic_requests_done/${decoded_token.user_id}`)
     .then(response => {
@@ -72,13 +72,15 @@ function DiagnosticRequestsDone() {
 if (under_warranty === true) {
   axios.get(`http://localhost:8000/api/user/order/device/${encodedDevice}`)
     .then(response => {
-      //setOrder(response.data)
-      console.log(response.data)
+      console.log(response)
     })
     .catch(error => {
       if(error.response.status === 302) {
         setOrder(error.response.data.date)
         setCheckOrder(true)
+      }
+      else {
+        setNotOrder("Nema")
       }
     });
 }
@@ -281,11 +283,13 @@ const refuseRequestDiagnostic = () => {
           <p>Preporuka servisera: <strong>{troubleshootingRequest.type}.</strong></p>
           <p>Dijagnostika je <strong>uspešno</strong> obavljena.</p>
           {checkOrder && <p>Uredjaj trenutno nije na stanju. Uredjaj stiže:{order.slice(0, 19).replace('T', ' ')} .</p>}
+          {notOrder && <p>Trenutno nema uredjaja na stanju niti se zna kada će pristići. Molimo pokušajte narednih dana</p>}
+          {!notOrder && <div>
           <Form.Group className="mb-3" controlId="formBasicDate">
             <Form.Label>Datum</Form.Label>
-            <Form.Control type="datetime-local" name="date"  value={troubleshootingRequest.date} onChange={handleFormInputChange("date")} />
+            <Form.Control type="datetime-local" name="date"  min={order.slice(0, 19).replace('T', ' ')} value={troubleshootingRequest.date} onChange={handleFormInputChange("date")} />
           </Form.Group>  
-         <Button onClick={createTroubleshootingRequest}>Potvrdi</Button> 
+         <Button onClick={createTroubleshootingRequest}>Potvrdi</Button> </div>}
          {checkResponse  && 
         <div style={{marginLeft:'110px'}}>
           {recommendedResponse && <p>Izabrani termin je zauzet.Preporučeni termin:</p>}

@@ -308,7 +308,11 @@ def get_number_of_devices(request, id):
 def get_order_by_device(request, name):
     device = Device.objects.get(name=name)
     if device.quantity == 0:
-        return Response(OrderService.get_order_by_device(name), status=status.HTTP_302_FOUND)
+        response = OrderService.get_order_by_device(name)
+        if response != None:
+            return Response(response, status=status.HTTP_302_FOUND)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
     else:
         return Response(status=status.HTTP_200_OK)
     
