@@ -20,6 +20,7 @@ import CreateDevice from './pages/Admin/CreateDevice';
 import ShowProfile from './pages/Admin/ShowProfile';
 import RepairerProfiles from './pages/User/RepairerProfiles';
 import TravelWarrant from './pages/Admin/TravelWarrant';
+import CreateOrder from './pages/Admin/CreateOrder';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 
@@ -50,6 +51,7 @@ function App() {
           <Route path= '/admin/users/profiles' element={<ShowProfile/>}/>
           <Route path= '/user/repairer/profiles' element={<RepairerProfiles/>}/>
           <Route path= '/admin/travelwarrant' element={<TravelWarrant/>}/>
+          <Route path= '/admin/create/order' element={<CreateOrder/>}/>
 
         </Routes>
       </BrowserRouter>

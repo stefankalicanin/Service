@@ -43,13 +43,13 @@ const NavBar = () => {
       {role === 'ADMIN' && <Nav.Link href="/admin/register">
           Registracija servisera
         </Nav.Link>}
-        {role === 'ADMIN' && <Nav.Link href="/admin/create/category">
-          Kreiranje kategorije
-        </Nav.Link>}
-        {role === 'ADMIN' && <Nav.Link href="/admin/create/device">
-          Kreiranje uredjaja
-        </Nav.Link>}
-        {role === 'ADMIN' && <Nav.Link href="/admin/users/profiles">
+        {role === 'ADMIN' && <NavDropdown title="Kreiraj" id="nav-dropdown">
+        <NavDropdown.Item eventKey="4.1" href="/admin/create/category">Kreiranje kategorije</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.2" href="/admin/create/device">Kreiranje uredjaja</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.3" href="/admin/create/order">Kreiranje narudzbine</NavDropdown.Item>
+        <NavDropdown.Divider />
+      </NavDropdown>}
+      {role === 'ADMIN' && <Nav.Link href="/admin/users/profiles">
           Prikaz profila korisnika
         </Nav.Link>}
         {role === 'ADMIN' && <Nav.Link href="/admin/travelwarrant">

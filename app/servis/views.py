@@ -11,7 +11,7 @@ from django.db.models import Q
 import json
 import os
 
-from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing, TravelWarrant
+from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing, TravelWarrant, Order
 from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService, UserService, TravelWarrantService
 
 @api_view(['GET'])
@@ -493,5 +493,21 @@ def unapproved_travel_warrant(request):
 @api_view(['GET'])
 def get_travelwarrant_by_scheduleappointment_id(request, id):
     return Response(TravelWarrantService.get_travelwarrant_by_scheduleappointment_id(id), status=status.HTTP_200_OK)
-   
-    
+
+@api_view(['GET'])
+def get_all_device(request, id):
+    return Response(DeviceService.get_all_device(id), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_order(request):
+    data = json.loads(request.body)
+
+    order = Order (
+        date = data['date'],
+        quantity = data['quantity'],
+        device = Device.objects.get(id=data['device_id'])
+    )
+
+    order.save()
+
+    return Response(status=status.HTTP_201_CREATED)
