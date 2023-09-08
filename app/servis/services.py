@@ -167,6 +167,13 @@ class DeviceService:
         return devicesSerializers.data
     
     @staticmethod
+    def get_all_device(category):
+        devices = Device.objects.filter(Q(category=category))
+        
+        devicesSerializers = DeviceSerializers(devices, many=True)
+        return devicesSerializers.data
+    
+    @staticmethod
     def get_devices_by_device(id):
         device = Device.objects.get(id=id)
         devices = Device.objects.filter(main_device=device)

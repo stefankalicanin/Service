@@ -10,6 +10,7 @@ urlpatterns = [
     path('user/diagnostic_request/save', views.create_diagnostic_request, name="User accept recommended diagnostic request"),
     path('user/all_categories', views.get_all_categories, name="Get all categories"),
     path('user/all_device_by_category/<int:id>', views.get_all_device_by_category, name="Get all device by category id"),
+    path('admin/all_device_by_category/<int:id>', views.get_all_device, name="All device by category id"),
     path('user/category/<int:id>', views.get_one_category, name="Get one category by id"),
     path('repairer/diagnostic_schedule_appointments/<int:id>', views.get_diagnostic_schedule_appointments_by_repairer, name="Get all diagnostic schedule appointments by repairer id"),
     path('repairer/profile/<int:id>', views.get_repairer_profile_by_user, name="Get repairer profile by user id"),
@@ -40,7 +41,8 @@ urlpatterns = [
     path('admin/diagnostic_request/<int:id>', views.get_diagnostic_request_by_schedule_appointment, name="Get details about travel warrant"),
     path('admin/travel_warrant/approved', views.approved_travel_warrant, name="Update travel warrant to approved"),
     path('admin/travel_warrant/unapproved', views.unapproved_travel_warrant, name="Update travel warrant to unapproved"),
-    path('repairer/travel_warrant/schedule_appointment/<int:id>', views.get_travelwarrant_by_scheduleappointment_id, name="Travel warrant by schedule appointment")
+    path('repairer/travel_warrant/schedule_appointment/<int:id>', views.get_travelwarrant_by_scheduleappointment_id, name="Travel warrant by schedule appointment"),
+    path('admin/createOrder', views.create_order, name="Create order")
 
 
 ]
