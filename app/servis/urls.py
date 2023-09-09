@@ -37,13 +37,20 @@ urlpatterns = [
     path('user/password/change', views.change_password_user, name="Change user password"),
     path('user/repairer/profiles', views.repairer_profiles, name="Repairer profiles"),
     path('repairer/travel_warrant_request', views.create_travel_warrant, name="Request for travel warrant"),
-    path('admin/travel_warrant_unapproved', views.get_travel_warrant_on_wait, name="Get all unapproved travel warrant"),
+    path('admin/travel_warrant_unapproved/troubleshooting', views.get_travel_warrant_troubleshooting_on_wait, name="Get all unapproved travel warrant troubleshooting"),
+    path('admin/travel_warrant_unapproved/diagnostic', views.get_travel_warrant_diagnostic_on_wait, name="Get all unapproved travel warrant diagnostic"),
     path('admin/diagnostic_request/<int:id>', views.get_diagnostic_request_by_schedule_appointment, name="Get details about travel warrant"),
-    path('admin/travel_warrant/approved', views.approved_travel_warrant, name="Update travel warrant to approved"),
-    path('admin/travel_warrant/unapproved', views.unapproved_travel_warrant, name="Update travel warrant to unapproved"),
+    path('admin/travel_warrant/troubleshooting/approved', views.approved_travel_warrant_troubleshooting, name="Update travel warrant troubleshooting to approved"),
+    path('admin/travel_warrant/troubleshooting/unapproved', views.unapproved_travel_warrant_troubleshooting, name="Update travel warrant troubleshooting to unapproved"),
+    path('admin/travel_warrant/diagnostic/approved', views.approved_travel_warrant_diagnostic, name="Update travel warrant diagnostic to approved"),
+    path('admin/travel_warrant/diagnostic/unapproved', views.unapproved_travel_warrant_diagnostic, name="Update travel warrant diagnostic to unapproved"),
     path('repairer/travel_warrant/schedule_appointment/<int:id>', views.get_travelwarrant_by_scheduleappointment_id, name="Travel warrant by schedule appointment"),
     path('admin/createOrder', views.create_order, name="Create order"),
-    path('user/travelwarrant/<int:id>', views.get_unnaproved_travelwarrant_by_user, name="Get unnaproved travel warrant by user")
+    path('user/travelwarrant/<int:id>', views.get_unnaproved_travelwarrant_by_user, name="Get unnaproved travel warrant by user"),
+    path('repairer/troubleshooting_report', views.create_troubleshooting_report, name="Create trobuleshooting report"),
+    path('repairert/travel_warrant_request', views.create_travel_warrant_troubleshooting, name="Create travel warrant for troubleshooting"),
+    path('admin/troubleshooting_request/<int:id>', views.get_troubleshooting_request_by_schedule_appointment, name="Get details about travel warrant troubleshooting"),
+
 
 
 ]

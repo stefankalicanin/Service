@@ -166,8 +166,14 @@ class Troubleshooting(models.Model):
         REPLACE = "REPLACE"
         REPAIR = "REPAIR"
 
+    class TroubleshootingState(models.TextChoices):
+        PROCESSED = "PROCESSED"
+        PROCESSING = "PROCESSING"
+        INITIAL = "INITIAL"
+        UNPROCESSED = "UNPROCESSED"
 
     type = models.CharField(max_length=7, choices=TypeOfTroubleshooting.choices)  
+    state = models.CharField(max_length=11, choices=TroubleshootingState.choices)  
     date = models.DateTimeField() 
     schedule_appointment = models.OneToOneField(
         ScheduleAppointment,

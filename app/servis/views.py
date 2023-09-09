@@ -11,7 +11,7 @@ from django.db.models import Q
 import json
 import os
 
-from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing, TravelWarrant, Order
+from core.models import Client, Location, Repairer, DiagnosticsRequest, Device, ScheduleAppointment, Category, Troubleshooting, CustomUser, DiagnosticReport, Pricing, TravelWarrant, Order, TroubleshootingReport
 from servis.services import UserProfileService, DiagnosticsRequestService, ScheduleAppointmentService, DiagnosticsRequestService, CategoryService, DeviceService, RepairerService, TroubleshootingService, DiagnosticReportService, OrderService, UserService, TravelWarrantService
 
 @api_view(['GET'])
@@ -229,7 +229,8 @@ def save_troubleshooting_request_repair(request):
         type = type_troubleshooting,
         date = start_time,
         schedule_appointment = schedule_appointment,
-        diagnostic_report = dr
+        diagnostic_report = dr,
+        state = Troubleshooting.TroubleshootingState.INITIAL
     )
 
     troubleshooting.save()
@@ -473,26 +474,48 @@ def create_travel_warrant(request):
     return Response(status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
-def get_travel_warrant_on_wait(request):
-    return Response(TravelWarrantService.get_all_on_wait_travel_warrant(), status=status.HTTP_200_OK)
+def get_travel_warrant_troubleshooting_on_wait(request):
+    return Response(TravelWarrantService.get_all_on_wait_travel_warrant_troubleshooting(), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_travel_warrant_diagnostic_on_wait(request):
+    return Response(TravelWarrantService.get_all_on_wait_travel_warrant_diagnostic(), status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_diagnostic_request_by_schedule_appointment(request, id):
     return Response(DiagnosticsRequestService.get_diagnostic_request_by_schedule_appointment(id), status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def get_troubleshooting_request_by_schedule_appointment(request, id):
+    return Response(TroubleshootingService.get_troubleshooting_request_by_schedule_appointment(id), status=status.HTTP_200_OK)
+
 @api_view(['POST'])
-def approved_travel_warrant(request):
+def approved_travel_warrant_troubleshooting(request):
     data = json.loads(request.body)
     id = data['id']
     
-    return Response(TravelWarrantService.approved(id), status=status.HTTP_200_OK)
+    return Response(TravelWarrantService.approved_troubleshooting(id), status=status.HTTP_200_OK)
     
 @api_view(['POST'])
-def unapproved_travel_warrant(request):
+def unapproved_travel_warrant_troubleshooting(request):
     data = json.loads(request.body)
     id = data['id']
 
-    return Response(TravelWarrantService.unapproved(id), status=status.HTTP_200_OK)
+    return Response(TravelWarrantService.unapproved_troubleshooting(id), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def approved_travel_warrant_diagnostic(request):
+    data = json.loads(request.body)
+    id = data['id']
+    
+    return Response(TravelWarrantService.approved_diagnostic(id), status=status.HTTP_200_OK)
+    
+@api_view(['POST'])
+def unapproved_travel_warrant_diagnostic(request):
+    data = json.loads(request.body)
+    id = data['id']
+
+    return Response(TravelWarrantService.unapproved_diagnostic(id), status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_travelwarrant_by_scheduleappointment_id(request, id):
@@ -519,3 +542,46 @@ def create_order(request):
 @api_view(['GET'])
 def get_unnaproved_travelwarrant_by_user(request, id):
     return Response(TravelWarrantService.get_unnaproved_travelwarrant_by_user(id), status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_troubleshooting_report(request):
+    data = json.loads(request.body)
+
+    troubleshooting = Troubleshooting.objects.get(id=data['id'])
+   
+    if data['state'] == True:
+        state = DiagnosticReport.State.SUCCESSFULLY
+    else:
+        state = DiagnosticReport.State.UNSUCCESSFULLY
+    
+    troubleshooting_report = TroubleshootingReport (
+        description = data['description'],
+        state = state,
+        troubleshooting = troubleshooting
+    )
+
+    troubleshooting_report.save()
+
+    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def create_travel_warrant_troubleshooting(request):
+    data = json.loads(request.body)
+
+    id = data['id']
+
+    schedule_appointment = ScheduleAppointment.objects.get(id=id)
+    
+    troubleshooting = Troubleshooting.objects.get(schedule_appointment=schedule_appointment)
+    troubleshooting.state = Troubleshooting.TroubleshootingState.PROCESSING
+    troubleshooting.save()
+
+    travel_warrant = TravelWarrant (
+        schedule_appointment = schedule_appointment,
+        state = TravelWarrant.TravelWarrantState.ON_WAIT
+    )
+
+    travel_warrant.save()
+
+    return Response(status=status.HTTP_201_CREATED)
+

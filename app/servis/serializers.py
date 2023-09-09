@@ -81,7 +81,7 @@ class TroubleshootingSerializers(serializers.ModelSerializer):
    
     class Meta:
         model = Troubleshooting
-        fields = ['id', 'type', 'date', 'schedule_appointment', 'diagnostic_report']
+        fields = ['id', 'type', 'date', 'state', 'schedule_appointment', 'diagnostic_report']
 
 class PricingSerializers(serializers.ModelSerializer):
 

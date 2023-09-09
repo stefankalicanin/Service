@@ -287,7 +287,7 @@ const refuseRequestDiagnostic = () => {
           {!notOrder && <div>
           <Form.Group className="mb-3" controlId="formBasicDate">
             <Form.Label>Datum</Form.Label>
-            <Form.Control type="datetime-local" name="date"  min={order.slice(0, 19).replace('T', ' ')} value={troubleshootingRequest.date} onChange={handleFormInputChange("date")} />
+            <Form.Control type="datetime-local" name="date"  value={troubleshootingRequest.date} onChange={handleFormInputChange("date")} />
           </Form.Group>  
          <Button onClick={createTroubleshootingRequest}>Potvrdi</Button> </div>}
          {checkResponse  && 

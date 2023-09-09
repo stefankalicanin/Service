@@ -22,6 +22,7 @@ import RepairerProfiles from './pages/User/RepairerProfiles';
 import TravelWarrant from './pages/Admin/TravelWarrant';
 import CreateOrder from './pages/Admin/CreateOrder';
 import UnnaprovedTravelWarrant from './pages/User/UnnaprovedTravelWarrant';
+import TravelWarrantTroubleshooting from './pages/Admin/TravelWarrantTroubleshooting';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 
@@ -51,7 +52,8 @@ function App() {
           <Route path= '/admin/create/device' element={<CreateDevice/>}/>
           <Route path= '/admin/users/profiles' element={<ShowProfile/>}/>
           <Route path= '/user/repairer/profiles' element={<RepairerProfiles/>}/>
-          <Route path= '/admin/travelwarrant' element={<TravelWarrant/>}/>
+          <Route path= '/admin/travel_warrant/diagnostic' element={<TravelWarrant/>}/>
+          <Route path= '/admin/travel_warrant/troubleshooting' element={<TravelWarrantTroubleshooting/>}/>
           <Route path= '/admin/create/order' element={<CreateOrder/>}/>
           <Route path= '/user/travel_warrant/unnaproved' element={<UnnaprovedTravelWarrant/>}/>
         </Routes>
