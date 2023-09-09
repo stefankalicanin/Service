@@ -49,7 +49,7 @@ function RepairDiagnosticAppointments() {
   .then(response => {
    console.log(response.data)
   })
-  .then(error => {
+  .catch(error => {
     console.log(error)
   })
   axios.post('http://localhost:8000/api/user/diagnostic_report',

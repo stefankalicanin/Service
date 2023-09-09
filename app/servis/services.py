@@ -234,6 +234,13 @@ class TroubleshootingService:
         troubleshootingSerializers = TroubleshootingSerializers(troubleshooting_requests, many=True)
         return troubleshootingSerializers.data     
     
+    @staticmethod
+    def get_troubleshooting_request_by_schedule_appointment(id):
+        schedule_appointment = ScheduleAppointment.objects.get(id=id)
+        troubleshooting = Troubleshooting.objects.get(schedule_appointment=schedule_appointment)
+
+        troubleshootingSerializers = TroubleshootingSerializers(troubleshooting)
+        return troubleshootingSerializers.data
 
 class DiagnosticReportService:
 
@@ -264,14 +271,51 @@ class OrderService:
 class TravelWarrantService:
 
     @staticmethod
-    def get_all_on_wait_travel_warrant():
-        travel_warrant = TravelWarrant.objects.filter(state=TravelWarrant.TravelWarrantState.ON_WAIT)
+    def get_all_on_wait_travel_warrant_troubleshooting():
+        troubleshooting = Troubleshooting.objects.filter(state=DiagnosticsRequest.DiagnosticState.PROCESSING)
+        schedule_appointment = []
+
+        for t in troubleshooting:
+            schedule_appointment.append(t.schedule_appointment)
+
+        travel_warrant = TravelWarrant.objects.filter(state=TravelWarrant.TravelWarrantState.ON_WAIT, schedule_appointment__in=schedule_appointment)
 
         travelWarrantSerializers = TravelWarrantSerializers(travel_warrant, many=True)
         return travelWarrantSerializers.data
     
     @staticmethod
-    def approved(id):
+    def get_all_on_wait_travel_warrant_diagnostic():
+        diagnostic_request = DiagnosticsRequest.objects.filter(state=DiagnosticsRequest.DiagnosticState.PROCESSING)
+        schedule_appointment = []
+
+        for t in diagnostic_request:
+            schedule_appointment.append(t.schedule_appointment)
+
+        travel_warrant = TravelWarrant.objects.filter(state=TravelWarrant.TravelWarrantState.ON_WAIT, schedule_appointment__in=schedule_appointment)
+
+        travelWarrantSerializers = TravelWarrantSerializers(travel_warrant, many=True)
+        return travelWarrantSerializers.data
+    
+    @staticmethod
+    def approved_troubleshooting(id):
+        travel_warrant = TravelWarrant.objects.filter(id=id).update(state=TravelWarrant.TravelWarrantState.APPROVED)
+        travel_warrant = TravelWarrant.objects.get(id=id)
+        schedule_appointment = travel_warrant.schedule_appointment
+        troubleshooting = Troubleshooting.objects.get(schedule_appointment=schedule_appointment)
+        Troubleshooting.objects.filter(id = troubleshooting.id).update(state=DiagnosticsRequest.DiagnosticState.PROCESSED)
+        return travel_warrant
+    
+    @staticmethod
+    def unapproved_troubleshooting(id):
+        travel_warrant = TravelWarrant.objects.filter(id=id).update(state=TravelWarrant.TravelWarrantState.UNAPPROVED)
+        travel_warrant = TravelWarrant.objects.get(id=id)
+        schedule_appointment = travel_warrant.schedule_appointment
+        troubleshooting = Troubleshooting.objects.get(schedule_appointment=schedule_appointment)
+        Troubleshooting.objects.filter(id = troubleshooting.id).update(state=DiagnosticsRequest.DiagnosticState.UNPROCESSED)
+        return travel_warrant
+    
+    @staticmethod
+    def approved_diagnostic(id):
         travel_warrant = TravelWarrant.objects.filter(id=id).update(state=TravelWarrant.TravelWarrantState.APPROVED)
         travel_warrant = TravelWarrant.objects.get(id=id)
         schedule_appointment = travel_warrant.schedule_appointment
@@ -280,11 +324,11 @@ class TravelWarrantService:
         return travel_warrant
     
     @staticmethod
-    def unapproved(id):
+    def unapproved_troubleshooting(id):
         travel_warrant = TravelWarrant.objects.filter(id=id).update(state=TravelWarrant.TravelWarrantState.UNAPPROVED)
         travel_warrant = TravelWarrant.objects.get(id=id)
         schedule_appointment = travel_warrant.schedule_appointment
-        diagnostic_request = DiagnosticsRequest.objects.get(schedule_appointment=schedule_appointment)
+        diagnostic_request = Troubleshooting.objects.get(schedule_appointment=schedule_appointment)
         DiagnosticsRequest.objects.filter(id = diagnostic_request.id).update(state=DiagnosticsRequest.DiagnosticState.UNPROCESSED)
         return travel_warrant
     

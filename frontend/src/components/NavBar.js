@@ -52,9 +52,12 @@ const NavBar = () => {
       {role === 'ADMIN' && <Nav.Link href="/admin/users/profiles">
           Prikaz profila korisnika
         </Nav.Link>}
-        {role === 'ADMIN' && <Nav.Link href="/admin/travelwarrant">
-          Putni nalozi
-          </Nav.Link>}
+        {role === 'ADMIN' && <NavDropdown title="Putni nalozi" id="nav-dropdown">
+        <NavDropdown.Item eventKey="4.1" href="/admin/travel_warrant/diagnostic">Za dijagnostiku</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.2" href="/admin/travel_warrant/troubleshooting">Za popravku</NavDropdown.Item>
+        
+        <NavDropdown.Divider />
+      </NavDropdown>}
       {!TokenService.getToken() && <Nav.Link href="/user/register">
           Registracija
       </Nav.Link> }
