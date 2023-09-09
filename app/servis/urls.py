@@ -42,7 +42,8 @@ urlpatterns = [
     path('admin/travel_warrant/approved', views.approved_travel_warrant, name="Update travel warrant to approved"),
     path('admin/travel_warrant/unapproved', views.unapproved_travel_warrant, name="Update travel warrant to unapproved"),
     path('repairer/travel_warrant/schedule_appointment/<int:id>', views.get_travelwarrant_by_scheduleappointment_id, name="Travel warrant by schedule appointment"),
-    path('admin/createOrder', views.create_order, name="Create order")
+    path('admin/createOrder', views.create_order, name="Create order"),
+    path('user/travelwarrant/<int:id>', views.get_unnaproved_travelwarrant_by_user, name="Get unnaproved travel warrant by user")
 
 
 ]

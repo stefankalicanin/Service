@@ -173,7 +173,7 @@ const handleUnapprovedTravelWarrant = (id) => {
       <th>{(dsa.type_house === 'IN SERVICE' && dsa.state === 'INITIAL') || (dsa.type_house === 'IN SERVICE' && dsa.state === 'PROCESSED') || (dsa.type_house === 'HOUSE' && dsa.state === 'PROCESSED') ? <Button onClick={()=>initModal(dsa)}>Napiši izveštaj</Button>
       :(dsa.type_house === 'HOUSE' && dsa.state === 'INITIAL') ? <Button className="btn-danger" onClick={() => createTravelWarrant(dsa.schedule_appointment.id)}>Putni nalog</Button>
       :(dsa.type_house === 'HOUSE' && dsa.state === 'PROCESSING') ? <Button className="btn-danger" disabled={true}>Odobravanje putnog naloga</Button>
-      :(dsa.type_house === 'HOUSE' && dsa.state === 'UNPROCESSED') ? <div><p>Putni nalog nije odobren</p><Button className="btn-danger" onClick={()=>handleUnapprovedTravelWarrant(dsa.id)}>OK</Button></div>:null}</th>
+      :(dsa.type_house === 'HOUSE' && dsa.state === 'UNPROCESSED') ? <div><p>Putni nalog nije odobren</p><Button className="btn-danger" onClick={()=>handleUnapprovedTravelWarrant(dsa.id)}>Obavesti korisnika</Button></div>:null}</th>
     </tr>
    ))}
   </tbody>
