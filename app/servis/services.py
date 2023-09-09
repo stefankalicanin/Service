@@ -296,4 +296,23 @@ class TravelWarrantService:
         travelWarrantSerializers = TravelWarrantSerializers(travel_warrant)
         return travelWarrantSerializers.data
     
+    @staticmethod
+    def get_unnaproved_travelwarrant_by_user(id):
+        user = get_user_model().objects.get(id=id)
+        client = Client.objects.get(user=user)
+
+        diagnostic_requests = DiagnosticsRequest.objects.filter(client=client, state=DiagnosticsRequest.DiagnosticState.PROCESSED)
+        schedule_appointment = []
+        for dr in diagnostic_requests:
+            schedule_appointment.append(dr.schedule_appointment)
+        
+        travel_warrants = TravelWarrant.objects.filter(schedule_appointment__in=schedule_appointment, state=TravelWarrant.TravelWarrantState.UNAPPROVED)
+        
+        schedule_appointment_travel_warrant_unnapproved = []
+        for tw in travel_warrants:
+            schedule_appointment_travel_warrant_unnapproved.append(tw.schedule_appointment)
+        
+        diagnostic_requests_tw_unnaproved = DiagnosticsRequest.objects.filter(schedule_appointment__in=schedule_appointment_travel_warrant_unnapproved)
+        daignosticRequestSerializers = DiagnosticsRequestSerializers(diagnostic_requests_tw_unnaproved, many=True)
+        return daignosticRequestSerializers.data
     

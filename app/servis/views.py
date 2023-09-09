@@ -515,3 +515,7 @@ def create_order(request):
     order.save()
 
     return Response(status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def get_unnaproved_travelwarrant_by_user(request, id):
+    return Response(TravelWarrantService.get_unnaproved_travelwarrant_by_user(id), status=status.HTTP_200_OK)
