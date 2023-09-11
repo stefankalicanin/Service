@@ -226,10 +226,12 @@ class TravelWarrant(models.Model):
 class TroubleshootingReport(models.Model):
     description = models.CharField(max_length=1024)
     state = models.CharField(max_length=14, choices=DiagnosticReport.State.choices)
+    unsuccessfully_processing = models.BooleanField(default=False)
     troubleshooting = models.OneToOneField(
         Troubleshooting,
         on_delete = models.CASCADE
     )
+   
 
     
 

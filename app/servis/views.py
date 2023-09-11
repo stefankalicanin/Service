@@ -285,13 +285,14 @@ def create_diagnostic_report(request):
         ready_for_repair = False
     )
     device = Device.objects.filter(name=data['broken_device']).exists()
-   
+    under_warranty = diagnostic_report.diagnostic_request.device.under_warranty
+
     if (device == False):
         device = Device (
             name = data['broken_device'],
-            description = "",
+            description = "Initial description",
             price = 0,
-            under_warranty = False,
+            under_warranty = under_warranty,
             quantity = 0,
             main_device = diagnostic_report.diagnostic_request.device,
             category = diagnostic_report.diagnostic_request.device.category

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Client, DiagnosticsRequest, ScheduleAppointment, Repairer, Category, Device, CustomUser, Troubleshooting, DiagnosticReport, Order, Pricing, TravelWarrant
+from core.models import Client, DiagnosticsRequest, ScheduleAppointment, Repairer, Category, Device, CustomUser, Troubleshooting, DiagnosticReport, Order, Pricing, TravelWarrant, TroubleshootingReport
 
 
 
@@ -82,6 +82,15 @@ class TroubleshootingSerializers(serializers.ModelSerializer):
     class Meta:
         model = Troubleshooting
         fields = ['id', 'type', 'date', 'state', 'schedule_appointment', 'diagnostic_report']
+
+
+class TroubleshootingReportSerializers(serializers.ModelSerializer):
+
+    troubleshooting = TroubleshootingSerializers()
+
+    class Meta:
+        model = TroubleshootingReport
+        fields = ['id', 'description', 'state', 'unsuccessfully_processing', 'troubleshooting']
 
 class PricingSerializers(serializers.ModelSerializer):
 

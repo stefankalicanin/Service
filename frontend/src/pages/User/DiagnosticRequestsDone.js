@@ -34,7 +34,7 @@ function DiagnosticRequestsDone() {
   const [order, setOrder] = useState()
   const [checkOrder, setCheckOrder] = useState(false)
   const [submit, setSubmit] = useState(false)
-  const [notOrder, setNotOrder] = useState()
+  const [notOrder, setNotOrder] = useState(false)
   useEffect (() => {
     axios.get(`http://localhost:8000/api/user/diagnostic_requests_done/${decoded_token.user_id}`)
     .then(response => {
@@ -66,6 +66,8 @@ function DiagnosticRequestsDone() {
     const under_warranty = matchingDiagnosticRequest.map(dr => dr.diagnostic_request.device.under_warranty)[0]
   
     const type = under_warranty ? "zamena":"popravka"
+    setDescription(desc)
+    setTroubleshootingRequest({...troubleshootingRequest, ["type"]: type, ["id_diagnostic_report"]:id})
     const device = matchingDiagnosticRequest.map(dr => dr.broken_device)[0];
     const encodedDevice = encodeURIComponent(device);
 
@@ -73,6 +75,9 @@ if (under_warranty === true) {
   axios.get(`http://localhost:8000/api/user/order/device/${encodedDevice}`)
     .then(response => {
       console.log(response)
+      setNotOrder(false)
+      setCheckOrder(false)
+      setOrder(null)
     })
     .catch(error => {
       if(error.response.status === 302) {
@@ -80,13 +85,14 @@ if (under_warranty === true) {
         setCheckOrder(true)
       }
       else {
-        setNotOrder("Nema")
+        setNotOrder(true)
+        setCheckOrder(false)
+        setOrder(null)
       }
     });
 }
 
-    setDescription(desc)
-    setTroubleshootingRequest({...troubleshootingRequest, ["type"]: type, ["id_diagnostic_report"]:id})
+    
   }
 
   const handleFormInputChange = (name) => (event) => {
