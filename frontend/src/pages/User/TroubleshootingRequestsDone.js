@@ -46,22 +46,20 @@ function TroubleshootingRequestsDone() {
       <table class="table table-dark">
   <thead>
     <tr>
-      <th scope="col">Date</th>
-      <th scope="col">Type</th>
-      <th scope="col">Start time</th>
-      <th scope="col">End time</th>
-      <th scope="col">Device</th>
+      <th scope="col">Početak</th>
+      <th scope="col">Kraj</th>
+      <th scope="col">Uredjaj</th>
+      <th scope="col">popravljeni uredjaj</th>
       <th scope="col">Report</th>
     </tr>
   </thead>
   <tbody>
     {troubleshooting.map(tr => (
       <tr key={tr.id}>
-        <th>{tr.date.replace('T', ' ').replace('Z', '')}</th>
-        <th>{tr.type}</th>
-        <th>{tr.schedule_appointment.start_time.replace('T', ' ').replace('Z', '')}</th>
-        <th>{tr.schedule_appointment.end_time.replace('T', ' ').replace('Z', '')}</th>
-        <th>{tr.diagnostic_request.device.name}</th>
+        <th>{tr.troubleshooting.schedule_appointment.start_time.replace('T', ' ').replace('Z', '')}</th>
+        <th>{tr.troubleshooting.schedule_appointment.end_time.replace('T', ' ').replace('Z', '')}</th>
+        <th>{tr.troubleshooting.diagnostic_report.diagnostic_request.device.name}</th>
+        <th>{tr.troubleshooting.diagnostic_report.broken_device}</th>
         <th><Button onClick={()=> createReport(tr.id)}>Report</Button></th>
       </tr>
     ))}

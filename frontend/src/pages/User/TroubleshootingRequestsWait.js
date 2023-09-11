@@ -26,21 +26,19 @@ function TroubleshootingRequestsWait() {
       <table class="table table-dark">
   <thead>
     <tr>
-      <th scope="col">Date</th>
-      <th scope="col">Type</th>
-      <th scope="col">Start time</th>
-      <th scope="col">End time</th>
-      <th scope="col">Device</th>
+      <th scope="col">Početak</th>
+      <th scope="col">Kraj</th>
+      <th scope="col">Uredjaj</th>
+      <th scope="col">Pokvareni uredjaj</th>
     </tr>
   </thead>
   <tbody>
     {troubleshooting.map(tr => (
       <tr key={tr.id}>
-        <th>{tr.date.replace('T', ' ').replace('Z', '')}</th>
-        <th>{tr.type}</th>
-        <th>{tr.schedule_appointment.start_time.replace('T', ' ').replace('Z', '')}</th>
-        <th>{tr.schedule_appointment.end_time.replace('T', ' ').replace('Z', '')}</th>
-        <th>{tr.diagnostic_request.device.name}</th>
+        <th>{tr.diagnostic_report.diagnostic_request.schedule_appointment.start_time.replace('T', ' ').replace('Z', '')}</th>
+        <th>{tr.diagnostic_report.diagnostic_request.schedule_appointment.end_time.replace('T', ' ').replace('Z', '')}</th>
+        <th>{tr.diagnostic_report.diagnostic_request.device.name}</th>
+        <th>{tr.diagnostic_report.broken_device}</th>
       </tr>
     ))}
     
