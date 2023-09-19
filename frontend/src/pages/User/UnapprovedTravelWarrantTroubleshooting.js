@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { TokenService } from '../../services/TokenService'
+import {React, useState, useEffect} from 'react'
 import axios from 'axios'
+import { TokenService } from '../../services/TokenService'
 
-function UnnaprovedTravelWarrantDiagnostic() {
+function UnapprovedTravelWarrantTroubleshooting() {
 
     const decoded_token = TokenService.decodeToken(TokenService.getToken())
     const [travelWarrant, setTrawelWarrant] = useState([])
 
     useEffect(() => {
-        axios.get(`http://localhost:8000/api/user/travelwarrant/diagnostic/unnapproved/${decoded_token.user_id}`)
+        axios.get(`http://localhost:8000/api/user/travelwarrant/troubleshooting/unnapproved/${decoded_token.user_id}`)
         .then(response => {
             console.log(response.data)
             setTrawelWarrant(response.data)
@@ -37,7 +37,7 @@ function UnnaprovedTravelWarrantDiagnostic() {
       <tr key={tw.id}>
         <th>{tw.schedule_appointment.start_time.replace('T', ' ').replace('Z', '')}</th>
         <th>{tw.schedule_appointment.end_time.replace('T', ' ').replace('Z', '')}</th>
-        <th>{tw.device.name}</th>
+        <th>{tw.diagnostic_report.diagnostic_request.device.name}</th>
         <th>{tw.schedule_appointment.repairer_profile.user.first_name} {tw.schedule_appointment.repairer_profile.user.last_name} </th>
       </tr>
     ))}
@@ -50,4 +50,4 @@ function UnnaprovedTravelWarrantDiagnostic() {
   )
 }
 
-export default UnnaprovedTravelWarrantDiagnostic
+export default UnapprovedTravelWarrantTroubleshooting

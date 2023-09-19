@@ -138,6 +138,17 @@ class ScheduleAppointmentService:
 
 
         return True
+    
+    @staticmethod
+    def update_troubleshooting_schedule_appointment_done(id):
+        troubleshooting = Troubleshooting.objects.get(id=id)
+        troubleshooting.state = Troubleshooting.TroubleshootingState.PROCESSED
+        troubleshooting.save()
+        
+        ScheduleAppointment.objects.filter(id=troubleshooting.schedule_appointment.id).update(is_done=True)
+
+
+        return True
 
 
 class CategoryService:
@@ -239,7 +250,7 @@ class TroubleshootingService:
         diagnostic_request = DiagnosticsRequest.objects.all().filter(Q(client=client,schedule_appointment__is_done=True, state=DiagnosticsRequest.DiagnosticState.PROCESSED))
         diagnostic_report = DiagnosticReport.objects.all().filter(Q(diagnostic_request__in=diagnostic_request, ready_for_repair=True, unsuccessfully_processing=False))
         troubleshooting = Troubleshooting.objects.all().filter(diagnostic_report__in=diagnostic_report, state=Troubleshooting.TroubleshootingState.PROCESSED)
-        troubleshooting_report = TroubleshootingReport.objects.all().filter(troubleshooting__in=troubleshooting)
+        troubleshooting_report = TroubleshootingReport.objects.all().filter(troubleshooting__in=troubleshooting, unsuccessfully_processing=False)
         troubleshootingReportSerializers = TroubleshootingReportSerializers(troubleshooting_report, many=True)
         return troubleshootingReportSerializers.data
     
@@ -350,7 +361,7 @@ class TravelWarrantService:
         return travelWarrantSerializers.data
     
     @staticmethod
-    def get_unnaproved_travelwarrant_by_user(id):
+    def get_unnaproved_diagnostic_travelwarrant_by_user(id):
         user = get_user_model().objects.get(id=id)
         client = Client.objects.get(user=user)
 
@@ -368,4 +379,24 @@ class TravelWarrantService:
         diagnostic_requests_tw_unnaproved = DiagnosticsRequest.objects.filter(schedule_appointment__in=schedule_appointment_travel_warrant_unnapproved)
         daignosticRequestSerializers = DiagnosticsRequestSerializers(diagnostic_requests_tw_unnaproved, many=True)
         return daignosticRequestSerializers.data
+    
+    @staticmethod
+    def get_unnapproved_troubleshooting_travelwarrant_by_user(id):
+        user = get_user_model().objects.get(id=id)
+        client = Client.objects.get(user=user)
+
+        troubleshooting = Troubleshooting.objects.filter(diagnostic_report__diagnostic_request__client=client, state=Troubleshooting.TroubleshootingState.PROCESSED)
+        schedule_appointment = []
+        for t in troubleshooting:
+            schedule_appointment.append(t.schedule_appointment)
+        
+        travel_warrants = TravelWarrant.objects.filter(schedule_appointment__in=schedule_appointment, state=TravelWarrant.TravelWarrantState.UNAPPROVED)
+        
+        schedule_appointment_travel_warrant_unnapproved = []
+        for tw in travel_warrants:
+            schedule_appointment_travel_warrant_unnapproved.append(tw.schedule_appointment)
+        
+        troubleshooting = Troubleshooting.objects.filter(schedule_appointment__in=schedule_appointment_travel_warrant_unnapproved)
+        troubleshootingSerializers = TroubleshootingSerializers(troubleshooting, many=True)
+        return troubleshootingSerializers.data
     

@@ -183,6 +183,10 @@ def get_repairer_profile_by_user(request, id):
 def update_diagnostic_schedule_appointment_done(request, id):
     return Response(ScheduleAppointmentService.update_diagnostic_schedule_appointment_done(id), status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def update_troubleshooting_schedule_appointment_done(request, id):
+    return Response(ScheduleAppointmentService.update_troubleshooting_schedule_appointment_done(id), status=status.HTTP_200_OK)
+
 @api_view(['GET'])
 def get_done_diagnostic_requests_by_user(request, id):
     return Response(DiagnosticReportService.get_done_diagnostic_requests_by_user(id), status=status.HTTP_200_OK)
@@ -205,6 +209,15 @@ def create_troubleshooting_request_repair(request):
 def save_troubleshooting_request_repair(request):
     data = json.loads(request.body)
     date = parse_datetime(data['date'])
+
+    try:
+        id_troubleshooting_report = data["id_troubleshooting"]
+        troubleshooting_report = TroubleshootingReport.objects.get(id=id_troubleshooting_report)
+        troubleshooting_report.unsuccessfully_processing = True
+        troubleshooting_report.save()
+    except Exception as e:
+        None
+
     type = data['type']
     response, start_time, end_time = TroubleshootingService.create_troubleshooting_request_repair(date)
     
@@ -541,8 +554,12 @@ def create_order(request):
     return Response(status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
-def get_unnaproved_travelwarrant_by_user(request, id):
-    return Response(TravelWarrantService.get_unnaproved_travelwarrant_by_user(id), status=status.HTTP_200_OK)
+def get_unnaproved_diagnostic_travelwarrant_by_user(request, id):
+    return Response(TravelWarrantService.get_unnaproved_diagnostic_travelwarrant_by_user(id), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_unnaproved_troubleshooting_travelwarrant_by_user(request, id):
+    return Response(TravelWarrantService.get_unnapproved_troubleshooting_travelwarrant_by_user(id), status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def create_troubleshooting_report(request):
