@@ -603,3 +603,7 @@ def create_travel_warrant_troubleshooting(request):
 
     return Response(status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+def get_scheduleappointment_for_pricing(request):
+    return Response(ScheduleAppointmentService.get_scheduleappointment_for_pricing(), status=status.HTTP_200_OK)
+

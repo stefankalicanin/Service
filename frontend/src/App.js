@@ -24,6 +24,7 @@ import CreateOrder from './pages/Admin/CreateOrder';
 import UnnaprovedTravelWarrantDiagnostic from './pages/User/UnnaprovedTravelWarrant';
 import UnapprovedTravelWarrantTroubleshooting from './pages/User/UnapprovedTravelWarrantTroubleshooting';
 import TravelWarrantTroubleshooting from './pages/Admin/TravelWarrantTroubleshooting';
+import Pricing from './pages/Admin/Pricing';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 
@@ -58,6 +59,7 @@ function App() {
           <Route path= '/admin/create/order' element={<CreateOrder/>}/>
           <Route path= '/user/travel_warrant/diagnostic/unnaproved' element={<UnnaprovedTravelWarrantDiagnostic/>}/>
           <Route path= '/user/travel_warrant/troubleshooting/unnaproved' element={<UnapprovedTravelWarrantTroubleshooting/>}/>
+          <Route path= '/admin/pricing' element={<Pricing/>}/>
 
         </Routes>
       </BrowserRouter>

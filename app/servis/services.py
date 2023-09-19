@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 import datetime
 
 from core.models import Client, DiagnosticsRequest, ScheduleAppointment, Repairer, Category, Device, Pricing, Troubleshooting, CustomUser, DiagnosticReport, Order, TravelWarrant, TroubleshootingReport
-from servis.serializers import UserProfileSerializers, DiagnosticsRequestSerializers, TroubleshootingSerializers, RepairerProfileSerializers, CategorySerializers, DeviceSerializers, DiagnosticReportSerializers, OrderSerializers, CustomUserSerializers, TravelWarrantSerializers, TroubleshootingReportSerializers
+from servis.serializers import UserProfileSerializers, DiagnosticsRequestSerializers, TroubleshootingSerializers, RepairerProfileSerializers, CategorySerializers, DeviceSerializers, DiagnosticReportSerializers, OrderSerializers, CustomUserSerializers, TravelWarrantSerializers, TroubleshootingReportSerializers, ScheduleAppointmentSerializers
     
 
 class UserService: 
@@ -149,6 +149,22 @@ class ScheduleAppointmentService:
 
 
         return True
+    
+    @staticmethod
+    def get_scheduleappointment_for_pricing():
+        troubleshootingReport = TroubleshootingReport.objects.all()
+    
+        scheduleAppointmentIds = [tr.troubleshooting.schedule_appointment.id for tr in troubleshootingReport]
+
+        if Pricing.objects.exists():
+            pricing = Pricing.objects.exclude(schedule_appointment_id__in=scheduleAppointmentIds)
+            scheduleAppointmentIds = list(set(sa.id for sa in pricing))
+
+        scheduleAppointmentForPricing = ScheduleAppointment.objects.filter(id__in=scheduleAppointmentIds)
+        
+        scheduleAppointmentSerializers = ScheduleAppointmentSerializers(scheduleAppointmentForPricing, many=True)
+        return scheduleAppointmentSerializers.data
+
 
 
 class CategoryService:
