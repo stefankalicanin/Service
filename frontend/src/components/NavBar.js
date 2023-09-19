@@ -66,7 +66,9 @@ const NavBar = () => {
         <NavDropdown.Item eventKey="4.2" href="/user/diagnostic_requests/wait">Zahtevi za dijagnostiku - na čekanju</NavDropdown.Item>
         <NavDropdown.Item eventKey="4.3" href="/user/troubleshooting_requests/done">Zahtevi za popravku - završeni</NavDropdown.Item>
         <NavDropdown.Item eventKey="4.4" href="/user/troubleshooting_requests/wait">Zahtevi za popravku - na čekanju</NavDropdown.Item>
-        <NavDropdown.Item eventKey="4.5" href="/user/travel_warrant/unnaproved">Neodobreni putni nalozi</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.5" href="/user/travel_warrant/diagnostic/unnaproved">Neodobreni putni nalozi - dijagnostika</NavDropdown.Item>
+        <NavDropdown.Item eventKey="4.6" href="/user/travel_warrant/troubleshooting/unnaproved">Neodobreni putni nalozi - popravka</NavDropdown.Item>
+
         <NavDropdown.Divider />
       </NavDropdown>}
       {role === 'USER' && <Nav.Link href="/user/repairer/profiles">

@@ -180,7 +180,7 @@ class Troubleshooting(models.Model):
         on_delete=models.CASCADE
     )
 
-    diagnostic_report = models.OneToOneField(
+    diagnostic_report = models.ForeignKey(
         DiagnosticReport,
         on_delete=models.CASCADE
     )

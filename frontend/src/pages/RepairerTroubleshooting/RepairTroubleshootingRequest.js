@@ -93,6 +93,17 @@ function RepairTroubleshootingRequest() {
       console.log(error)
     })
    }
+
+   const handleUnapprovedTravelWarrant = (id) => {
+    axios.post(`http://localhost:8000/api/repairert/update_troubleshooting_schedule_appointment_done/${id}`)
+    .then(response => {
+     console.log(response.data)
+     window.location.reload()
+    })
+    .then(error => {
+      console.log(error)
+    })
+   }
   return (
     <div>
       {checkTable ? <div style={{
@@ -123,7 +134,7 @@ function RepairTroubleshootingRequest() {
               <th>{(t.diagnostic_report.diagnostic_request.type_house === 'IN SERVICE' && t.state === 'INITIAL') || (t.diagnostic_report.diagnostic_request.type_house === 'IN SERVICE' && t.state === 'PROCESSED') || (t.diagnostic_report.diagnostic_request.type_house === 'HOUSE' && t.state === 'PROCESSED') ? <Button onClick={()=>initModal(t.id)}>Napiši izveštaj</Button>
       :(t.diagnostic_report.diagnostic_request.type_house === 'HOUSE' && t.state === 'INITIAL') ? <Button className="btn-danger" onClick={()=>createTravelWarrant(t.schedule_appointment.id)}>Putni nalog</Button>
       :(t.diagnostic_report.diagnostic_request.type_house === 'HOUSE' && t.state === 'PROCESSING') ? <Button className="btn-danger" disabled={true}>Odobravanje putnog naloga</Button>
-      :(t.diagnostic_report.diagnostic_request.type_house === 'HOUSE' && t.state === 'UNPROCESSED') ? <div><p>Putni nalog nije odobren</p><Button className="btn-danger" >Obavesti korisnika</Button></div>:null}</th>
+      :(t.diagnostic_report.diagnostic_request.type_house === 'HOUSE' && t.state === 'UNPROCESSED') ? <div><p>Putni nalog nije odobren</p><Button className="btn-danger" onClick={()=>handleUnapprovedTravelWarrant(t.id)}>Obavesti korisnika</Button></div>:null}</th>
             </tr>
           ))}
         </tbody>
