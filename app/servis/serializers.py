@@ -59,10 +59,11 @@ class DiagnosticsRequestSerializers(serializers.ModelSerializer):
 
     device = DeviceSerializers()
     schedule_appointment = ScheduleAppointmentSerializers()
-
+    client = UserProfileSerializers()
+    
     class Meta:
         model = DiagnosticsRequest
-        fields = ['id', 'date', 'device','type_house', 'state', 'schedule_appointment']
+        fields = ['id', 'date', 'device','type_house', 'state', 'schedule_appointment', 'client']
 
 class DiagnosticReportSerializers(serializers.ModelSerializer):
 
