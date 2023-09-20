@@ -52,7 +52,8 @@ urlpatterns = [
     path('repairer/troubleshooting_report', views.create_troubleshooting_report, name="Create trobuleshooting report"),
     path('repairert/travel_warrant_request', views.create_travel_warrant_troubleshooting, name="Create travel warrant for troubleshooting"),
     path('admin/troubleshooting_request/<int:id>', views.get_troubleshooting_request_by_schedule_appointment, name="Get details about travel warrant troubleshooting"),
-    path('admin/pricing/all', views.get_scheduleappointment_for_pricing, name="Get all schedule appointment for pricing")
+    path('admin/pricing/all', views.get_scheduleappointment_for_pricing, name="Get all schedule appointment for pricing"),
+    path('admin/pricing/create', views.create_pricing, name="Create price for user")
 
 
 

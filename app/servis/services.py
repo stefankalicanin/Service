@@ -157,13 +157,16 @@ class ScheduleAppointmentService:
         scheduleAppointmentIds = [tr.troubleshooting.schedule_appointment.id for tr in troubleshootingReport]
 
         if Pricing.objects.exists():
-            pricing = Pricing.objects.exclude(schedule_appointment_id__in=scheduleAppointmentIds)
-            scheduleAppointmentIds = list(set(sa.id for sa in pricing))
+            pricing = Pricing.objects.filter(schedule_appointment_id__in=scheduleAppointmentIds)
+            for p in pricing:
+                if p.schedule_appointment.id in scheduleAppointmentIds:
+                    scheduleAppointmentIds.remove(p.schedule_appointment.id)
 
         scheduleAppointmentForPricing = ScheduleAppointment.objects.filter(id__in=scheduleAppointmentIds)
-        
-        scheduleAppointmentSerializers = ScheduleAppointmentSerializers(scheduleAppointmentForPricing, many=True)
-        return scheduleAppointmentSerializers.data
+        troubleshooting = TroubleshootingReport.objects.filter(troubleshooting__schedule_appointment__in=scheduleAppointmentForPricing, state=DiagnosticReport.State.SUCCESSFULLY)
+
+        troubleshootingSerializers = TroubleshootingReportSerializers(troubleshooting, many=True)
+        return troubleshootingSerializers.data
 
 
 

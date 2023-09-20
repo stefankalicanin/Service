@@ -607,3 +607,23 @@ def create_travel_warrant_troubleshooting(request):
 def get_scheduleappointment_for_pricing(request):
     return Response(ScheduleAppointmentService.get_scheduleappointment_for_pricing(), status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def create_pricing(request):
+    data = json.loads(request.body)
+
+    price = data['price']
+    schedule_appointment = ScheduleAppointment.objects.get(id=data['schedule_appointment_id'])
+    client = Client.objects.get(id=data['client_id'])
+    discount_quota = 1
+    if client.privileges:
+        discount_quota = 0.5
+
+    pricing = Pricing (
+        price = price*discount_quota,
+        discount_quota = discount_quota,
+        schedule_appointment = schedule_appointment
+    )
+
+    pricing.save()
+
+    return Response(status=status.HTTP_201_CREATED)
